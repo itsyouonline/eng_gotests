@@ -82,38 +82,15 @@ func writeBlock(data []byte, i, blockSize int) error {
 	return capnp.NewEncoder(buf).Encode(msg)
 }
 
-// - encode 1M capnp message & write it to mem mapped file
+// - encode 1M capnp message to capnp list & write it to mem mapped file
+
 // - read some data
-func writeBulkRead(num int) error {
-	log.Printf("======== create %v capnp messages and write it to mem mapped file ==========\n", num)
-
-	// create the capnp aggregation object
-	aggMsg, aggSeg, err := capnp.NewMessage(capnp.SingleSegment(nil))
-	if err != nil {
-		return err
-	}
-	agg, err := NewRootTlogAggregation(aggSeg)
-	if err != nil {
-		return err
-	}
-	agg.SetName("the 1 M message")
-	agg.SetSize(0)
-	blockList, err := agg.NewBlocks(int32(num))
-	if err != nil {
-		return err
-	}
-
-	// add blocks
-	for i := 0; i < blockList.Len(); i++ {
-		block := blockList.At(i)
-		setBlockVal(&block, i)
-	}
-
-	agg.SetSize(uint64(num))
-
-	size := countMemSize(num)
+func writeListRead(num int) error {
+	log.Printf("======== create %v capnp messages to capnp list and write it to mem mapped file ==========\n", num)
 
 	// create mem mapped file
+	size := countMemSize(num)
+
 	f, data, err := createMemMap(size)
 	if err != nil {
 		return err
@@ -121,14 +98,13 @@ func writeBulkRead(num int) error {
 	defer f.Close()
 	defer syscall.Munmap(data)
 	buf := bytes.NewBuffer(data)
-	buf.Truncate(0)
 
-	// write capnp msg to mem mapped file
-	if err := capnp.NewEncoder(buf).Encode(aggMsg); err != nil {
+	// create & write capnp msg to mem mapped file
+	if err := writeList(num, buf); err != nil {
 		return err
 	}
 
-	// read it again
+	// read it again to verify the content
 	_, decodedBlockList, err := decodeAggBlocks(buf)
 	if err != nil {
 		log.Printf("failed to decode block list:%v", err)
@@ -144,6 +120,38 @@ func writeBulkRead(num int) error {
 	log.Println("all  good")
 
 	return nil
+}
+
+func writeList(num int, buf *bytes.Buffer) error {
+	buf.Truncate(0)
+
+	// create the capnp aggregation object
+	aggMsg, aggSeg, err := capnp.NewMessage(capnp.SingleSegment(nil))
+	if err != nil {
+		return err
+	}
+	agg, err := NewRootTlogAggregation(aggSeg)
+	if err != nil {
+		return err
+	}
+
+	agg.SetName("the 1 M message")
+	agg.SetSize(0)
+	blockList, err := agg.NewBlocks(int32(num))
+	if err != nil {
+		return err
+	}
+
+	// add blocks
+	for i := 0; i < blockList.Len(); i++ {
+		block := blockList.At(i)
+		setBlockVal(&block, i)
+	}
+
+	agg.SetSize(uint64(num))
+
+	// write capnp msg to mem mapped file
+	return capnp.NewEncoder(buf).Encode(aggMsg)
 }
 
 func decodeAggBlocks(buf *bytes.Buffer) (*TlogAggregation, *TlogBlock_List, error) {

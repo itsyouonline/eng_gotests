@@ -9,17 +9,17 @@ import (
 )
 
 var (
-	mmapBulk bool
+	mmapList bool
 	mmapOne  bool
 )
 
 func main() {
-	flag.BoolVar(&mmapBulk, "mmap-bulk", false, "write bulk and read bulk")
-	flag.BoolVar(&mmapOne, "mmap-one", false, "write one and read one")
+	flag.BoolVar(&mmapList, "mmap-list", false, "write & read capnp list from mmap'ed file")
+	flag.BoolVar(&mmapOne, "mmap-one", false, "write one  and read one capnp from mmap'ed file")
 
 	flag.Parse()
 
-	if !mmapBulk && !mmapOne {
+	if !mmapList && !mmapOne {
 		fmt.Println("please specify test to perform")
 		fmt.Println("run with '-h' option to see all available tests")
 		return
@@ -27,8 +27,8 @@ func main() {
 
 	num := 1000 * 1000
 
-	if mmapBulk {
-		if err := writeBulkRead(num); err != nil {
+	if mmapList {
+		if err := writeListRead(num); err != nil {
 			log.Printf("err = %v\n", err)
 		}
 	}
