@@ -16,6 +16,7 @@ func checkMemUsageList(num int) {
 	buf := bytes.NewBuffer(bs)
 
 	log.Println("---mem stats after allocating buffer that will be used by capnp list--")
+	log.Println("---it is not go dependent, but capnp dependent---")
 	runtime.ReadMemStats(&mem)
 	printMemUsage(mem)
 	startAlloc := mem.Alloc

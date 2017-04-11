@@ -93,5 +93,5 @@ func createMemMap(size int) (*os.File, []byte, error) {
 }
 
 func countMemSize(num int) int {
-	return num * 40
+	return num * 20
 }
