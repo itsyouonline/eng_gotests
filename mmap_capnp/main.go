@@ -11,15 +11,17 @@ import (
 var (
 	mmapList bool
 	mmapOne  bool
+	memList  bool
 )
 
 func main() {
 	flag.BoolVar(&mmapList, "mmap-list", false, "write & read capnp list from mmap'ed file")
 	flag.BoolVar(&mmapOne, "mmap-one", false, "write one  and read one capnp from mmap'ed file")
+	flag.BoolVar(&memList, "mem-list", false, "check memory usage of capnp list")
 
 	flag.Parse()
 
-	if !mmapList && !mmapOne {
+	if !mmapList && !mmapOne && !memList {
 		fmt.Println("please specify test to perform")
 		fmt.Println("run with '-h' option to see all available tests")
 		return
@@ -37,6 +39,10 @@ func main() {
 		if err := writeOneReadOne(num, 70); err != nil {
 			log.Printf("writeOneReadOn err = %v\n", err)
 		}
+	}
+
+	if memList {
+		checkMemUsageList(num)
 	}
 }
 
