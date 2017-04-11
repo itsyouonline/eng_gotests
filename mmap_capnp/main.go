@@ -4,13 +4,13 @@ import (
 	"bytes"
 	"log"
 	"os"
-	//"syscall"
+	"syscall"
 
 	"zombiezen.com/go/capnproto2"
 )
 
 func main() {
-	if err := writeBulkRead(1000); err != nil {
+	if err := writeBulkRead(1000 * 1000); err != nil {
 		log.Printf("err = %v\n", err)
 	}
 }
@@ -48,11 +48,14 @@ func writeBulkRead(num int) error {
 	agg.SetSize(uint64(num))
 
 	size := num * 40 // TODO : how we estimate the size of generated capnp message?
+
 	// create mem mapped file
 	f, err := os.Create("/tmp/capnp_mmap")
 	if err != nil {
 		return err
 	}
+	defer f.Close()
+
 	if _, err := f.Seek(int64(size-1), 0); err != nil {
 		return err
 	}
@@ -61,11 +64,12 @@ func writeBulkRead(num int) error {
 		return err
 	}
 
-	//data, err := syscall.Mmap(int(f.Fd()), 0, size, syscall.PROT_WRITE|syscall.PROT_READ, syscall.MAP_SHARED)
-	//if err != nil {
-	//	return err
-	//}
-	data := make([]byte, size)
+	data, err := syscall.Mmap(int(f.Fd()), 0, size, syscall.PROT_WRITE|syscall.PROT_READ, syscall.MAP_SHARED)
+	if err != nil {
+		return err
+	}
+	defer syscall.Munmap(data)
+
 	buf := bytes.NewBuffer(data)
 
 	buf.Write([]byte("hello, just a test"))
