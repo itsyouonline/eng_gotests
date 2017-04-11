@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"log"
 	"os"
-	"syscall"
+	//"syscall"
 
 	"zombiezen.com/go/capnproto2"
 )
@@ -21,7 +21,7 @@ func writeBulkRead(num int) error {
 	log.Println("create 1M capnp messages and write it to mem mapped file")
 
 	// create the capnp aggregation object
-	aggMsg, aggSeg, err := capnp.NewMessage(capnp.MultiSegment(nil))
+	aggMsg, aggSeg, err := capnp.NewMessage(capnp.SingleSegment(nil))
 	if err != nil {
 		return err
 	}
@@ -31,38 +31,23 @@ func writeBulkRead(num int) error {
 	}
 	agg.SetName("the 1 M message")
 	agg.SetSize(0)
-
-	// create tlogblock list
-	_, blockListSeg, err := capnp.NewMessage(capnp.MultiSegment(nil))
-	if err != nil {
-		return err
-	}
-	blockList, err := NewTlogBlock_List(blockListSeg, int32(num))
+	blockList, err := agg.NewBlocks(int32(num))
 	if err != nil {
 		return err
 	}
 
 	// add blocks
-	for i := 0; i < num; i++ {
-		_, blockSeg, err := capnp.NewMessage(capnp.MultiSegment(nil))
-		if err != nil {
-			return err
-		}
-		block, err := NewRootTlogBlock(blockSeg)
-		if err != nil {
-			return err
-		}
+	for i := 0; i < blockList.Len(); i++ {
+		block := blockList.At(i)
 		block.SetVolumeId(1)
 		block.SetSequence(uint64(i))
 		block.SetLba(uint64(i))
 		block.SetTimestamp(uint64(i))
 
-		blockList.Set(i, block)
 	}
-	agg.SetBlocks(blockList)
 	agg.SetSize(uint64(num))
 
-	size := num * 100 // TODO : how we estimate the size of generated capnp message?
+	size := num * 40 // TODO : how we estimate the size of generated capnp message?
 	// create mem mapped file
 	f, err := os.Create("/tmp/capnp_mmap")
 	if err != nil {
@@ -76,10 +61,11 @@ func writeBulkRead(num int) error {
 		return err
 	}
 
-	data, err := syscall.Mmap(int(f.Fd()), 0, size, syscall.PROT_WRITE|syscall.PROT_READ, syscall.MAP_SHARED)
-	if err != nil {
-		return err
-	}
+	//data, err := syscall.Mmap(int(f.Fd()), 0, size, syscall.PROT_WRITE|syscall.PROT_READ, syscall.MAP_SHARED)
+	//if err != nil {
+	//	return err
+	//}
+	data := make([]byte, size)
 	buf := bytes.NewBuffer(data)
 
 	buf.Write([]byte("hello, just a test"))
@@ -99,7 +85,7 @@ func writeBulkRead(num int) error {
 		log.Printf("failed to decode message:%v", err)
 		return err
 	}
-	name, err := agg.Name()
+	name, err := decodedAgg.Name()
 	if err != nil {
 		log.Printf("failed to get agg name:%v\n", err)
 	}
