@@ -23,8 +23,14 @@ func writeOneReadOne(num, blockSize int) error {
 	defer syscall.Munmap(data)
 
 	for i := 0; i < num; i++ {
+
+		// set the buf
+		start := i * blockSize
+		end := start + blockSize
+		buf := bytes.NewBuffer(data[start:end])
+
 		// write block
-		if err := writeBlock(data, i, blockSize); err != nil {
+		if err := writeBlock(buf, i, blockSize); err != nil {
 			return err
 		}
 
@@ -61,7 +67,8 @@ func decodeBlock(data []byte, i, blockSize int) (*TlogBlock, error) {
 	block, err := ReadRootTlogBlock(msg)
 	return &block, err
 }
-func writeBlock(data []byte, i, blockSize int) error {
+
+func writeBlock(buf *bytes.Buffer, i, blockSize int) error {
 	// create block
 	msg, seg, err := capnp.NewMessage(capnp.SingleSegment(nil))
 	if err != nil {
@@ -74,9 +81,6 @@ func writeBlock(data []byte, i, blockSize int) error {
 	setBlockVal(&block, i)
 
 	// add it to mmap'ed file
-	start := i * blockSize
-	end := start + blockSize
-	buf := bytes.NewBuffer(data[start:end])
 	buf.Truncate(0)
 
 	return capnp.NewEncoder(buf).Encode(msg)

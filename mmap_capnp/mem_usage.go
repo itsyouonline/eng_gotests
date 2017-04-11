@@ -9,10 +9,14 @@ import (
 	"github.com/dustin/go-humanize"
 )
 
+const (
+	tlogBlockSize = 20
+)
+
 func checkMemUsageList(num int) {
 	var mem runtime.MemStats
 
-	bs := make([]byte, countMemSize(num))
+	bs := make([]byte, (num*tlogBlockSize)+100)
 	buf := bytes.NewBuffer(bs)
 
 	log.Println("---mem stats after allocating buffer that will be used by capnp list--")
@@ -32,6 +36,34 @@ func checkMemUsageList(num int) {
 
 	allocated := mem.Alloc - startAlloc
 	fmt.Printf("----> there are %v bytes allocated\n", humanize.Comma(int64(allocated)))
+}
+
+func checkMemUsageMap(num int) {
+	var mem runtime.MemStats
+	container := map[int][]byte{}
+	for i := 0; i < num; i++ {
+		container[i] = make([]byte, tlogBlockSize)
+	}
+
+	log.Println("---mem stats after allocating buffer that will be used by capnp list--")
+	log.Println("---other than Go Map memory usage, other memory usage is needed by capnp format---")
+	runtime.ReadMemStats(&mem)
+	printMemUsage(mem)
+	startAlloc := mem.Alloc
+
+	for i := 0; i < num; i++ {
+		buf := bytes.NewBuffer(container[i])
+		writeBlock(buf, i, tlogBlockSize)
+	}
+
+	log.Println("---mem stats after write capnp lists to memory--")
+
+	runtime.ReadMemStats(&mem)
+	printMemUsage(mem)
+
+	allocated := mem.Alloc - startAlloc
+	fmt.Printf("----> there are %v bytes allocated\n", humanize.Comma(int64(allocated)))
+
 }
 
 func printMemUsage(mem runtime.MemStats) {
