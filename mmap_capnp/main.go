@@ -51,26 +51,6 @@ func main() {
 	}
 }
 
-func setBlockVal(block *TlogBlock, val int) {
-	block.SetVolumeId(uint32(val))
-	block.SetSequence(uint64(val))
-	block.SetLba(uint64(val))
-	block.SetTimestamp(uint64(val))
-}
-
-func checkBlockVal(block *TlogBlock, val int) {
-	if block.VolumeId() != uint32(val) {
-		log.Fatalf("invalid volume id. expected:%v, got:%v", val, block.VolumeId)
-	}
-	if block.Sequence() != uint64(val) {
-		log.Fatalf("invalid sequence. expected:%v, got:%v", val, block.Sequence())
-	}
-	if block.Timestamp() != uint64(val) {
-		log.Fatalf("invalid timestamp. expected:%v, got:%v", val, block.Timestamp())
-	}
-
-}
-
 // create mmap'ed file with given size
 func createMemMap(size int) (*os.File, []byte, error) {
 	// create mem mapped file

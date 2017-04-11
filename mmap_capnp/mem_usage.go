@@ -36,6 +36,8 @@ func checkMemUsageList(num int) {
 
 	allocated := mem.Alloc - startAlloc
 	fmt.Printf("----> there are %v bytes allocated\n", humanize.Comma(int64(allocated)))
+
+	// make sure we can decode it
 }
 
 func checkMemUsageMap(num int) {
