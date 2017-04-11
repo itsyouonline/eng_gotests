@@ -2,7 +2,7 @@
 
 This repo holds 3 implementation of the same simple RPC server.
 There is an implementation in go, nim and python.
-The original repo can be found [here](https://docs.greenitglobe.com/rnd/capnp_bechmarks). More detailed information can be found in the respective directories
+The original repo can be found [here](https://docs.greenitglobe.com/rnd/capnp_bechmarks). More detailed information can be found in the respective directories, for example [go](go)
 
 ## Purpose:
 
