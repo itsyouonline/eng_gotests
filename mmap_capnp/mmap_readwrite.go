@@ -106,17 +106,3 @@ func writeListRead(num int) error {
 
 	return nil
 }
-
-func decodeAggBlocks(buf *bytes.Buffer) (*TlogAggregation, *TlogBlock_List, error) {
-	msg, err := capnp.NewDecoder(buf).Decode()
-	if err != nil {
-		return nil, nil, err
-	}
-	agg, err := ReadRootTlogAggregation(msg)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	blocks, err := agg.Blocks()
-	return &agg, &blocks, err
-}

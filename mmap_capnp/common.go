@@ -59,6 +59,20 @@ func writeList(num int, buf *bytes.Buffer) error {
 	return capnp.NewEncoder(buf).Encode(aggMsg)
 }
 
+// decode tlog aggregation
+func decodeAggBlocks(buf *bytes.Buffer) (*TlogAggregation, *TlogBlock_List, error) {
+	msg, err := capnp.NewDecoder(buf).Decode()
+	if err != nil {
+		return nil, nil, err
+	}
+	agg, err := ReadRootTlogAggregation(msg)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	blocks, err := agg.Blocks()
+	return &agg, &blocks, err
+}
 func setBlockVal(block *TlogBlock, val int) {
 	block.SetVolumeId(uint32(val))
 	block.SetSequence(uint64(val))
