@@ -4,8 +4,6 @@ import (
 	"bytes"
 	"log"
 	"syscall"
-
-	"zombiezen.com/go/capnproto2"
 )
 
 // for 0..num
@@ -40,8 +38,11 @@ func writeOneReadOne(num, blockSize int) error {
 
 		// decode some block
 		readIdx := i / 2
+		start = readIdx * blockSize
+		end = start + blockSize
+		buf = bytes.NewBuffer(data[start:end])
 
-		decodedBlock, err := decodeBlock(data, readIdx, blockSize)
+		decodedBlock, err := decodeBlock(buf)
 		if err != nil {
 			log.Printf("failed to decode block:%v\n", err)
 			return err
@@ -52,20 +53,6 @@ func writeOneReadOne(num, blockSize int) error {
 	}
 	log.Println("all  good")
 	return nil
-}
-
-func decodeBlock(data []byte, i, blockSize int) (*TlogBlock, error) {
-	start := i * blockSize
-	end := start + blockSize
-	buf := bytes.NewBuffer(data[start:end])
-
-	msg, err := capnp.NewDecoder(buf).Decode()
-	if err != nil {
-		return nil, err
-	}
-
-	block, err := ReadRootTlogBlock(msg)
-	return &block, err
 }
 
 // - encode 1M capnp message to capnp list & write it to mem mapped file

@@ -25,6 +25,19 @@ func writeBlock(buf *bytes.Buffer, i, blockSize int) error {
 
 	return capnp.NewEncoder(buf).Encode(msg)
 }
+func decodeBlock(buf *bytes.Buffer) (*TlogBlock, error) {
+	msg, err := capnp.NewDecoder(buf).Decode()
+	if err != nil {
+		log.Printf("decode failed :%v\n", err)
+		return nil, err
+	}
+
+	block, err := ReadRootTlogBlock(msg)
+	if err != nil {
+		log.Printf("decode failed to read root block:%v\n", err)
+	}
+	return &block, err
+}
 
 // write tlog blocks to capnp list
 func writeList(num int, buf *bytes.Buffer) error {

@@ -62,31 +62,51 @@ func checkMemUsageList(num int) {
 }
 
 func checkMemUsageMap(num int) {
-	var mem runtime.MemStats
+	log.Println("------- check memory usage of in-memory canpnp stored in Go map -----")
+
 	container := map[int][]byte{}
 	for i := 0; i < num; i++ {
 		container[i] = make([]byte, tlogBlockSize)
 	}
+	bufSize := tlogBlockSize * num
+	fmt.Printf("buffer size:%v bytes -> it is not Go dependent, but capnp dependent\n", humanize.Comma(int64(bufSize)))
 
-	log.Println("---mem stats after allocating buffer that will be used by capnp list--")
-	log.Println("---other than Go Map memory usage, other memory usage is needed by capnp format---")
-	runtime.ReadMemStats(&mem)
-	printMemUsage(mem)
-	startAlloc := mem.Alloc
+	var memMap runtime.MemStats
+	runtime.ReadMemStats(&memMap)
 
+	fmt.Printf("total memory allocation:\n")
+	fmt.Printf("\tmap of buffer: %v bytes\n",
+		humanize.Comma(int64(memMap.TotalAlloc)))
+	fmt.Printf("\tbuffer overhead: %v bytes\n",
+		humanize.Comma(int64(memMap.TotalAlloc-uint64(bufSize))))
+
+	// encode it
 	for i := 0; i < num; i++ {
 		buf := bytes.NewBuffer(container[i])
+		buf.Truncate(0)
 		writeBlock(buf, i, tlogBlockSize)
 	}
 
-	log.Println("---mem stats after write capnp lists to memory--")
+	var memEncode runtime.MemStats
+	runtime.ReadMemStats(&memEncode)
 
-	runtime.ReadMemStats(&mem)
-	printMemUsage(mem)
+	allocated := memEncode.TotalAlloc - memMap.TotalAlloc
+	fmt.Printf("\tcapnp encode:%v bytes\n", humanize.Comma(int64(allocated)))
 
-	allocated := mem.Alloc - startAlloc
-	fmt.Printf("----> there are %v bytes allocated\n", humanize.Comma(int64(allocated)))
+	// decode it
+	for i := 0; i < num; i++ {
+		buf := bytes.NewBuffer(container[i])
+		block, err := decodeBlock(buf)
+		if err != nil {
+			log.Fatalf("failed to decode block: %v :%v\n", i, err)
+		}
 
+		// check some of it, no need to check all
+		// only make sure we did encode/decode corretlu
+		if i < 10 {
+			checkBlockVal(block, i)
+		}
+	}
 }
 
 func printMemUsage(mem runtime.MemStats) {
