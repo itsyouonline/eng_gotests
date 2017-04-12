@@ -34,7 +34,7 @@ func main() {
 	// definde the command line flags
 	app.Flags = []cli.Flag{
 		cli.BoolFlag{
-			// debugl logging
+			// debug logging
 			Name:        "debug, d",
 			Usage:       "Enable debug logging",
 			Destination: &debugLogging,
