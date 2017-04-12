@@ -17,6 +17,8 @@ var (
 	memMapEncoded  bool
 	loadFile       bool
 	loadFileMmap   bool
+	optDataLen     int
+	optNum         int
 )
 
 func main() {
@@ -28,6 +30,8 @@ func main() {
 	flag.BoolVar(&memMapEncoded, "mem-map-encoded", false, "check memory usage of encoded capnp in Go map")
 	flag.BoolVar(&loadFile, "load-file", false, "load plain file")
 	flag.BoolVar(&loadFileMmap, "load-file-mmap", false, "load mmap'ed file")
+	flag.IntVar(&optDataLen, "data-len", 0, "number of bytes of data to add to the capnp message(default = 0)")
+	flag.IntVar(&optNum, "num", 1000*1000, "number of messages (default = 1M)")
 
 	flag.Parse()
 
@@ -37,7 +41,7 @@ func main() {
 		return
 	}
 
-	num := 1000 * 1000
+	num := optNum
 
 	if mmapList {
 		if err := writeListRead(num); err != nil {

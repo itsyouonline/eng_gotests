@@ -9,6 +9,8 @@ import (
 	"os"
 	"syscall"
 	"time"
+
+	"github.com/dustin/go-humanize"
 )
 
 func perfLoadFile(num int, isMmap bool) {
@@ -20,14 +22,18 @@ func perfLoadFile(num int, isMmap bool) {
 	}
 
 	defer func() {
-		//name := f.Name()
+		name := f.Name()
 		f.Close()
-		//os.Remove(name)
+		os.Remove(name)
 	}()
 
+	// write file
+	writeList(num, bufio.NewWriter(f))
+
+	// decode it back
 	r, err := getReader(f, isMmap)
 	if err != nil {
-		log.Fatal("failed to create reader:%v", err)
+		log.Fatalf("failed to create reader:%v", err)
 	}
 
 	start := time.Now()
@@ -40,8 +46,9 @@ func perfLoadFile(num int, isMmap bool) {
 		_ = blocks.At(i)
 	}
 
-	fmt.Printf("number of messages:%v\n", num)
+	fmt.Printf("number of messages:%v\n", humanize.Comma(int64(num)))
 	fmt.Printf("mmap : %v\n", isMmap)
+	fmt.Printf("file size:%v bytes\n", humanize.Comma(getFileSize(f)))
 	fmt.Printf("time:%v seconds\n", time.Since(start).Seconds())
 }
 
@@ -51,17 +58,13 @@ func getReader(f *os.File, isMmap bool) (io.Reader, error) {
 		return bufio.NewReader(f), nil
 	}
 
-	fi, err := f.Stat()
-	if err != nil {
-		return nil, err
-	}
-
-	data, err := syscall.Mmap(int(f.Fd()), 0, int(fi.Size()), syscall.PROT_WRITE|syscall.PROT_READ, syscall.MAP_SHARED)
+	data, err := syscall.Mmap(int(f.Fd()), 0, int(getFileSize(f)), syscall.PROT_WRITE|syscall.PROT_READ, syscall.MAP_SHARED)
 	if err != nil {
 		return nil, err
 	}
 	return bytes.NewBuffer(data), nil
 }
+
 func createCapnpFile(filename string, num int) (*os.File, error) {
 	f, err := os.Create(filename)
 	if err != nil {
@@ -70,4 +73,12 @@ func createCapnpFile(filename string, num int) (*os.File, error) {
 	w := bufio.NewWriter(f)
 
 	return f, writeList(num, w)
+}
+
+func getFileSize(f *os.File) int64 {
+	fi, err := f.Stat()
+	if err != nil {
+		log.Fatalf("failed to get file size of '%v' err:%v", f.Name, err)
+	}
+	return fi.Size()
 }

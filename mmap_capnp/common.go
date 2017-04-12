@@ -103,6 +103,11 @@ func decodeAggBlocks(r io.Reader) (*TlogAggregation, *TlogBlock_List, error) {
 }
 func setBlockVal(block *TlogBlock, val int) {
 	block.SetSequence(uint64(val))
+
+	if optDataLen > 0 {
+		b := make([]byte, optDataLen) //yes, we make allocation here!
+		block.SetText(string(b))
+	}
 }
 
 func checkBlockVal(block *TlogBlock, val int) {
@@ -112,5 +117,7 @@ func checkBlockVal(block *TlogBlock, val int) {
 }
 
 func dataLenInBlock() int {
-	return 8 /* sequence */ + 4 /* capnp overhead */
+	len := 8 /* sequence */ + 4 /* capnp overhead */
+	len += optDataLen           /* text */
+	return len
 }
