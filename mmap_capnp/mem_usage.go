@@ -9,15 +9,69 @@ import (
 	"github.com/dustin/go-humanize"
 )
 
-const (
-	tlogBlockSize = 20
-)
+func tlogBlockSize() int {
+	return dataLenInBlock()
+}
 
 func checkMemUsageList(num int) {
 	log.Println("------- check memory usage of in-memory canpnp list -----")
 
+	var memStart runtime.MemStats
+	runtime.ReadMemStats(&memStart)
+
+	if _, err := createList(num); err != nil {
+		log.Fatalf("failed to write to capnp list")
+	}
+
+	var memList runtime.MemStats
+	runtime.ReadMemStats(&memList)
+
+	fmt.Printf("total memory allocation:\n")
+	allocated := memList.TotalAlloc - memStart.TotalAlloc
+	fmt.Printf("\ttotal alloc:%v bytes\n", humanize.Comma(int64(allocated)))
+	fmt.Printf("\ttotal alloc - freed:%v bytes\n", humanize.Comma(int64(memList.HeapAlloc-memStart.HeapAlloc)))
+
+}
+
+func checkMemUsageMap(num int) {
+	log.Println("------- check memory usage of in-memory canpnp stored in Go map -----")
+	/*
+		container := make(map[int]TlogBlock, num)
+
+		// encode it
+		for i := 0; i < num; i++ {
+			buf := bytes.NewBuffer(container[i])
+			buf.Truncate(0)
+			writeBlock(buf, i, tlogBlockSize())
+		}
+
+		var memEncode runtime.MemStats
+		runtime.ReadMemStats(&memEncode)
+
+		allocated := memEncode.TotalAlloc - memMap.TotalAlloc
+		fmt.Printf("\tcapnp encode:%v bytes\n", humanize.Comma(int64(allocated)))
+
+		// decode it
+		for i := 0; i < num; i++ {
+			buf := bytes.NewBuffer(container[i])
+			block, err := decodeBlock(buf)
+			if err != nil {
+				log.Fatalf("failed to decode block: %v :%v\n", i, err)
+			}
+
+			// check some of it, no need to check all
+			// only make sure we did encode/decode corretlu
+			if i < 10 {
+				checkBlockVal(block, i)
+			}
+		}*/
+}
+
+func checkMemUsageListEncoded(num int) {
+	log.Println("------- check memory usage of in-memory encoded canpnp list -----")
+
 	// allocate memory
-	bufSize := (num * tlogBlockSize) + 100
+	bufSize := (num * tlogBlockSize()) + 100
 	bs := make([]byte, bufSize)
 	buf := bytes.NewBuffer(bs)
 
@@ -61,15 +115,15 @@ func checkMemUsageList(num int) {
 	}
 }
 
-func checkMemUsageMap(num int) {
-	log.Println("------- check memory usage of in-memory canpnp stored in Go map -----")
+func checkMemUsageMapEncoded(num int) {
+	log.Println("------- check memory usage of in-memory encoded canpnp stored in Go map -----")
 
 	container := make(map[int][]byte, num)
 	for i := 0; i < num; i++ {
-		container[i] = make([]byte, tlogBlockSize)
+		container[i] = make([]byte, tlogBlockSize())
 	}
 
-	bufSize := tlogBlockSize * num
+	bufSize := tlogBlockSize() * num
 	fmt.Printf("buffer size:%v bytes -> it is not Go dependent, but capnp dependent\n", humanize.Comma(int64(bufSize)))
 
 	var memMap runtime.MemStats
@@ -85,7 +139,7 @@ func checkMemUsageMap(num int) {
 	for i := 0; i < num; i++ {
 		buf := bytes.NewBuffer(container[i])
 		buf.Truncate(0)
-		writeBlock(buf, i, tlogBlockSize)
+		writeBlock(buf, i)
 	}
 
 	var memEncode runtime.MemStats

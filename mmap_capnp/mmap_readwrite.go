@@ -28,7 +28,7 @@ func writeOneReadOne(num, blockSize int) error {
 		buf := bytes.NewBuffer(data[start:end])
 
 		// write block
-		if err := writeBlock(buf, i, blockSize); err != nil {
+		if err := writeBlock(buf, i); err != nil {
 			return err
 		}
 
@@ -61,7 +61,7 @@ func writeListRead(num int) error {
 	log.Printf("======== create %v capnp messages to capnp list and write it to mem mapped file ==========\n", num)
 
 	// create mem mapped file
-	size := countMemSize(num)
+	size := 100 + (num * dataLenInBlock())
 
 	f, data, err := createMemMap(size)
 	if err != nil {

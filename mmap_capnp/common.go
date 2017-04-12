@@ -7,19 +7,26 @@ import (
 	"zombiezen.com/go/capnproto2"
 )
 
-// write single tlog block to a buffer
-func writeBlock(buf *bytes.Buffer, i, blockSize int) error {
+func createBlock(i int) (*TlogBlock, *capnp.Message, error) {
 	// create block
 	msg, seg, err := capnp.NewMessage(capnp.SingleSegment(nil))
 	if err != nil {
-		return err
+		return nil, nil, err
 	}
 	block, err := NewRootTlogBlock(seg)
 	if err != nil {
-		return err
+		return nil, nil, err
 	}
 	setBlockVal(&block, i)
+	return &block, msg, nil
+}
 
+// write single tlog block to a buffer
+func writeBlock(buf *bytes.Buffer, i int) error {
+	_, msg, err := createBlock(i)
+	if err != nil {
+		return err
+	}
 	// add it to mmap'ed file
 	buf.Truncate(0)
 
@@ -39,25 +46,22 @@ func decodeBlock(buf *bytes.Buffer) (*TlogBlock, error) {
 	return &block, err
 }
 
-// write tlog blocks to capnp list
-func writeList(num int, buf *bytes.Buffer) error {
-	buf.Truncate(0)
-
+func createList(num int) (*capnp.Message, error) {
 	// create the capnp aggregation object
 	aggMsg, aggSeg, err := capnp.NewMessage(capnp.SingleSegment(nil))
 	if err != nil {
-		return err
+		return nil, err
 	}
 	agg, err := NewRootTlogAggregation(aggSeg)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	agg.SetName("the 1 M message")
 	agg.SetSize(0)
 	blockList, err := agg.NewBlocks(int32(num))
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	// add blocks
@@ -67,7 +71,17 @@ func writeList(num int, buf *bytes.Buffer) error {
 	}
 
 	agg.SetSize(uint64(num))
+	return aggMsg, nil
+}
 
+// write tlog blocks to capnp list
+func writeList(num int, buf *bytes.Buffer) error {
+	aggMsg, err := createList(num)
+	if err != nil {
+		return err
+	}
+
+	buf.Truncate(0)
 	// write capnp msg to mem mapped file
 	return capnp.NewEncoder(buf).Encode(aggMsg)
 }
@@ -87,21 +101,15 @@ func decodeAggBlocks(buf *bytes.Buffer) (*TlogAggregation, *TlogBlock_List, erro
 	return &agg, &blocks, err
 }
 func setBlockVal(block *TlogBlock, val int) {
-	block.SetVolumeId(uint32(val))
 	block.SetSequence(uint64(val))
-	block.SetLba(uint64(val))
-	block.SetTimestamp(uint64(val))
 }
 
 func checkBlockVal(block *TlogBlock, val int) {
-	if block.VolumeId() != uint32(val) {
-		log.Fatalf("invalid volume id. expected:%v, got:%v", val, block.VolumeId)
-	}
 	if block.Sequence() != uint64(val) {
 		log.Fatalf("invalid sequence. expected:%v, got:%v", val, block.Sequence())
 	}
-	if block.Timestamp() != uint64(val) {
-		log.Fatalf("invalid timestamp. expected:%v, got:%v", val, block.Timestamp())
-	}
+}
 
+func dataLenInBlock() int {
+	return 8 /* sequence */ + 4 /* capnp overhead */
 }
