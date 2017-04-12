@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"log"
+	"math/big"
 	"runtime"
 
 	"github.com/dustin/go-humanize"
@@ -29,11 +30,7 @@ func checkMemUsageList(num int) {
 	var memList runtime.MemStats
 	runtime.ReadMemStats(&memList)
 
-	fmt.Printf("total memory allocation:\n")
-	allocated := memList.TotalAlloc - memStart.TotalAlloc
-	fmt.Printf("\ttotal alloc:%v bytes\n", humanize.Comma(int64(allocated)))
-	fmt.Printf("\ttotal alloc - freed:%v bytes\n", humanize.Comma(int64(memList.HeapAlloc-memStart.HeapAlloc)))
-
+	printMemDif(memStart, memList)
 }
 
 func checkMemUsageMap(num int) {
@@ -57,11 +54,7 @@ func checkMemUsageMap(num int) {
 	var memList runtime.MemStats
 	runtime.ReadMemStats(&memList)
 
-	fmt.Printf("total memory allocation:\n")
-	allocated := memList.TotalAlloc - memStart.TotalAlloc
-	fmt.Printf("\ttotal alloc:%v bytes\n", humanize.Comma(int64(allocated)))
-	fmt.Printf("\ttotal alloc - freed:%v bytes\n", humanize.Comma(int64(memList.HeapAlloc-memStart.HeapAlloc)))
-
+	printMemDif(memStart, memList)
 }
 
 func checkMemUsageListEncoded(num int) {
@@ -164,6 +157,17 @@ func checkMemUsageMapEncoded(num int) {
 	}
 }
 
+func printMemDif(memStart, memEnd runtime.MemStats) {
+	fmt.Printf("memory stats:\n")
+	fmt.Printf("\ttotal alloc : %v\n", formatMemValue(memEnd.TotalAlloc-memStart.TotalAlloc))
+	fmt.Printf("\theap in use : %v\n", formatMemValue(memEnd.HeapInuse-memStart.HeapInuse))
+	fmt.Printf("\tstack in use : %v\n", formatMemValue(memEnd.StackInuse-memStart.StackInuse))
+}
+
+func formatMemValue(val uint64) string {
+	x := big.NewInt(int64(val))
+	return humanize.BigBytes(x)
+}
 func printMemUsage(mem runtime.MemStats) {
 	fmt.Printf("alloc       : %v bytes\n", humanize.Comma(int64(mem.Alloc)))
 	fmt.Printf("total alloc : %v bytes\n", humanize.Comma(int64(mem.TotalAlloc)))
