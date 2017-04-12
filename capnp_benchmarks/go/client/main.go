@@ -94,6 +94,7 @@ func main() {
 		storeClient := &Client{}
 		// call the Dial function of the Client and pass the serverAddress variable.
 		// Store the returned error in a newly declared `err` variable
+		// by using the := operator, we both declare and assign the variable
 		err := storeClient.Dial(serverAddress)
 		// check if the Dial function actually returned an error
 		if err != nil {
