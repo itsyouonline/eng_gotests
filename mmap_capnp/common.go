@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"io"
 	"log"
 
 	"zombiezen.com/go/capnproto2"
@@ -76,20 +77,19 @@ func createList(num int) (*capnp.Message, error) {
 }
 
 // write tlog blocks to capnp list
-func writeList(num int, buf *bytes.Buffer) error {
+func writeList(num int, w io.Writer) error {
 	aggMsg, err := createList(num)
 	if err != nil {
 		return err
 	}
 
-	buf.Truncate(0)
-	// write capnp msg to mem mapped file
-	return capnp.NewEncoder(buf).Encode(aggMsg)
+	// write capnp msg
+	return capnp.NewEncoder(w).Encode(aggMsg)
 }
 
 // decode tlog aggregation
-func decodeAggBlocks(buf *bytes.Buffer) (*TlogAggregation, *TlogBlock_List, error) {
-	msg, err := capnp.NewDecoder(buf).Decode()
+func decodeAggBlocks(r io.Reader) (*TlogAggregation, *TlogBlock_List, error) {
+	msg, err := capnp.NewDecoder(r).Decode()
 	if err != nil {
 		return nil, nil, err
 	}

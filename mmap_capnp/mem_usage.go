@@ -85,6 +85,7 @@ func checkMemUsageListEncoded(num int) {
 	fmt.Printf("\tbuffer overhead: %v bytes\n",
 		humanize.Comma(int64(memBuf.TotalAlloc-uint64(bufSize))))
 
+	buf.Truncate(0)
 	if err := writeList(num, buf); err != nil {
 		log.Fatalf("failed to write to capnp list")
 	}

@@ -15,6 +15,8 @@ var (
 	memMap         bool
 	memListEncoded bool
 	memMapEncoded  bool
+	loadFile       bool
+	loadFileMmap   bool
 )
 
 func main() {
@@ -24,10 +26,12 @@ func main() {
 	flag.BoolVar(&memMap, "mem-map", false, "check memory usage of capnp stored in Go map")
 	flag.BoolVar(&memListEncoded, "mem-list-encoded", false, "check memory usage of encoded capnp list")
 	flag.BoolVar(&memMapEncoded, "mem-map-encoded", false, "check memory usage of encoded capnp in Go map")
+	flag.BoolVar(&loadFile, "load-file", false, "load plain file")
+	flag.BoolVar(&loadFileMmap, "load-file-mmap", false, "load mmap'ed file")
 
 	flag.Parse()
 
-	if !mmapList && !mmapOne && !memList && !memMap && !memListEncoded && !memMapEncoded {
+	if !mmapList && !mmapOne && !memList && !memMap && !memListEncoded && !memMapEncoded && !loadFile && !loadFileMmap {
 		fmt.Println("please specify test to perform")
 		fmt.Println("run with '-h' option to see all available tests")
 		return
@@ -58,6 +62,12 @@ func main() {
 	}
 	if memMapEncoded {
 		checkMemUsageMapEncoded(num / 1000)
+	}
+	if loadFile {
+		perfLoadFile(num, false)
+	}
+	if loadFileMmap {
+		perfLoadFile(num, true)
 	}
 }
 

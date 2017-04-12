@@ -72,6 +72,7 @@ func writeListRead(num int) error {
 	buf := bytes.NewBuffer(data)
 
 	// create & write capnp msg to mem mapped file
+	buf.Truncate(0)
 	if err := writeList(num, buf); err != nil {
 		return err
 	}
