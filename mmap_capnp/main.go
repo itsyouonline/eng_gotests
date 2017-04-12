@@ -50,7 +50,7 @@ func main() {
 	}
 
 	if mmapOne {
-		if err := writeOneReadOne(num, dataLenInBlock()+20); err != nil {
+		if err := writeOneReadOne(num); err != nil {
 			log.Printf("writeOneReadOn err = %v\n", err)
 		}
 	}

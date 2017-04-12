@@ -10,8 +10,11 @@ import (
 // 	- encode canpnp message
 //  - add it to mmap'ed file
 //  - read some written capnp message
-func writeOneReadOne(num, blockSize int) error {
+func writeOneReadOne(num int) error {
 	log.Printf("====== for i...%v {write one capnp doc, read one capnp doc} ========= \n", num)
+
+	blockSize := dataLenInBlock() + 30 /* 30 extra space needed by capnp. TODO : find a way to count it automatically*/
+
 	// create mem mapped file
 	f, data, err := createMemMap(num * blockSize)
 	if err != nil {
