@@ -40,7 +40,7 @@ func main() {
 		log.Fatalf("Connection refused: %s", err)
 	}
 
-	space := 512
+	space := "xxx"
 	index := "id"
 
 	data := make([]byte, dataLen)
