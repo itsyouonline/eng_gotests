@@ -6,7 +6,7 @@ The client can optionally be started with a couple of command line flags:
 - `-h, --help`: This will cause the client to print the application name, usage, version, commands and possible flags. The client then exits.
 - `-d, --debug`: The client log level will be set to `debug`. This causes logs defined as debug to be printed to the terminal, which are ignored if this flag is not set.
 - `-v, --version`: Like help, but only print the application name and version before exiting.
-- `-s, --server`: The value following this flag is set as the remote capnp rpc server address to be used by this client in the benchmark. It must be set to the same value as the server
+- `-s, --server`: The value following this flag is set as the remote capnp rpc server address to be used by this client in the benchmark. The port must be set to the same value as the server
 
 Note that all flags are optional. If the server flag is not set, it defaults to localhost and the port specified in the constants.
 
