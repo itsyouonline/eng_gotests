@@ -64,10 +64,11 @@ func checkMemUsageList(num int) {
 func checkMemUsageMap(num int) {
 	log.Println("------- check memory usage of in-memory canpnp stored in Go map -----")
 
-	container := map[int][]byte{}
+	container := make(map[int][]byte, num)
 	for i := 0; i < num; i++ {
 		container[i] = make([]byte, tlogBlockSize)
 	}
+
 	bufSize := tlogBlockSize * num
 	fmt.Printf("buffer size:%v bytes -> it is not Go dependent, but capnp dependent\n", humanize.Comma(int64(bufSize)))
 
