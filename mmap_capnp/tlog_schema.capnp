@@ -4,13 +4,8 @@ $Go.package("main");
 $Go.import("main");
 
 struct TlogBlock {
-	volumeId @0 :UInt32;
-	sequence @1 :UInt64;
-	lba @2 :UInt64;
-	size @3 :UInt32;
-	crc32  @4 :UInt32;
-	data @5 :Data;
-	timestamp @6 :UInt64;
+	sequence @0 :UInt64;
+	text @1 :Text;
 }
 
 struct TlogAggregation {

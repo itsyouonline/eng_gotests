@@ -66,6 +66,8 @@ func checkMemUsageMap(num int) {
 
 func checkMemUsageListEncoded(num int) {
 	log.Println("------- check memory usage of in-memory encoded canpnp list -----")
+	fmt.Printf("stored data size:%v bytes \n", dataLenInBlock())
+	fmt.Printf("number of message:%v\n", humanize.Comma(int64(num)))
 
 	// allocate memory
 	bufSize := (num * tlogBlockSize()) + 100
