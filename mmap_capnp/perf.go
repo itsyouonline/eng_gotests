@@ -15,6 +15,7 @@ import (
 
 func perfLoadFile(num int, isMmap bool) {
 	log.Println("------  load & walk capnp message")
+
 	// create the file
 	f, err := createCapnpFile("/tmp/capnp_perf", num)
 	if err != nil {
@@ -26,9 +27,6 @@ func perfLoadFile(num int, isMmap bool) {
 		f.Close()
 		os.Remove(name)
 	}()
-
-	// write file
-	writeList(num, bufio.NewWriter(f))
 
 	// decode it back
 	r, err := getReader(f, isMmap)

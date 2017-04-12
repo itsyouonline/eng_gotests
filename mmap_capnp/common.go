@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 	"log"
 
@@ -78,12 +79,14 @@ func createList(num int) (*capnp.Message, error) {
 
 // write tlog blocks to capnp list
 func writeList(num int, w io.Writer) error {
+	fmt.Println("create capnp messages aggregation...")
 	aggMsg, err := createList(num)
 	if err != nil {
 		return err
 	}
 
 	// write capnp msg
+	fmt.Println("write capnp messages to file/memory...")
 	return capnp.NewEncoder(w).Encode(aggMsg)
 }
 
