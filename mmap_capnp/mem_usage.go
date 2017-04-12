@@ -7,6 +7,7 @@ import (
 	"runtime"
 
 	"github.com/dustin/go-humanize"
+	"zombiezen.com/go/capnproto2"
 )
 
 func tlogBlockSize() int {
@@ -15,6 +16,8 @@ func tlogBlockSize() int {
 
 func checkMemUsageList(num int) {
 	log.Println("------- check memory usage of in-memory canpnp list -----")
+	fmt.Printf("stored data size:%v bytes \n", dataLenInBlock())
+	fmt.Printf("number of message:%v\n", humanize.Comma(int64(num)))
 
 	var memStart runtime.MemStats
 	runtime.ReadMemStats(&memStart)
@@ -35,36 +38,30 @@ func checkMemUsageList(num int) {
 
 func checkMemUsageMap(num int) {
 	log.Println("------- check memory usage of in-memory canpnp stored in Go map -----")
-	/*
-		container := make(map[int]TlogBlock, num)
+	fmt.Printf("stored data size:%v bytes \n", dataLenInBlock())
+	fmt.Printf("number of message:%v\n", humanize.Comma(int64(num)))
 
-		// encode it
-		for i := 0; i < num; i++ {
-			buf := bytes.NewBuffer(container[i])
-			buf.Truncate(0)
-			writeBlock(buf, i, tlogBlockSize())
+	var memStart runtime.MemStats
+	runtime.ReadMemStats(&memStart)
+
+	container := make(map[int]*capnp.Message, num)
+
+	// encode it
+	for i := 0; i < num; i++ {
+		_, msg, err := createBlock(i)
+		if err != nil {
+			log.Fatal(err)
 		}
+		container[i] = msg
+	}
+	var memList runtime.MemStats
+	runtime.ReadMemStats(&memList)
 
-		var memEncode runtime.MemStats
-		runtime.ReadMemStats(&memEncode)
+	fmt.Printf("total memory allocation:\n")
+	allocated := memList.TotalAlloc - memStart.TotalAlloc
+	fmt.Printf("\ttotal alloc:%v bytes\n", humanize.Comma(int64(allocated)))
+	fmt.Printf("\ttotal alloc - freed:%v bytes\n", humanize.Comma(int64(memList.HeapAlloc-memStart.HeapAlloc)))
 
-		allocated := memEncode.TotalAlloc - memMap.TotalAlloc
-		fmt.Printf("\tcapnp encode:%v bytes\n", humanize.Comma(int64(allocated)))
-
-		// decode it
-		for i := 0; i < num; i++ {
-			buf := bytes.NewBuffer(container[i])
-			block, err := decodeBlock(buf)
-			if err != nil {
-				log.Fatalf("failed to decode block: %v :%v\n", i, err)
-			}
-
-			// check some of it, no need to check all
-			// only make sure we did encode/decode corretlu
-			if i < 10 {
-				checkBlockVal(block, i)
-			}
-		}*/
 }
 
 func checkMemUsageListEncoded(num int) {

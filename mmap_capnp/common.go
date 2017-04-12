@@ -32,6 +32,7 @@ func writeBlock(buf *bytes.Buffer, i int) error {
 
 	return capnp.NewEncoder(buf).Encode(msg)
 }
+
 func decodeBlock(buf *bytes.Buffer) (*TlogBlock, error) {
 	msg, err := capnp.NewDecoder(buf).Decode()
 	if err != nil {

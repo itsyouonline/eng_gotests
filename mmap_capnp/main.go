@@ -49,7 +49,7 @@ func main() {
 		checkMemUsageList(num)
 	}
 	if memMap {
-		checkMemUsageMap(num)
+		checkMemUsageMap(num / 10)
 	}
 	if memListEncoded {
 		checkMemUsageListEncoded(num)
