@@ -2,10 +2,10 @@ package main
 
 import (
 	"bytes"
-	"fmt"
-	"log"
 	"math/big"
 	"runtime"
+
+	log "github.com/Sirupsen/logrus"
 
 	"github.com/dustin/go-humanize"
 	"zombiezen.com/go/capnproto2"
@@ -16,9 +16,9 @@ func tlogBlockSize() int {
 }
 
 func checkMemUsageList(num int) {
-	log.Println("------- check memory usage of in-memory canpnp list -----")
-	fmt.Printf("stored data size:%v bytes \n", dataLenInBlock())
-	fmt.Printf("number of message:%v\n", humanize.Comma(int64(num)))
+	log.Info("------- check memory usage of in-memory canpnp list -----")
+	log.Infof("stored data size:%v bytes", dataLenInBlock())
+	log.Infof("number of message:%v", humanize.Comma(int64(num)))
 
 	var memStart runtime.MemStats
 	runtime.ReadMemStats(&memStart)
@@ -34,9 +34,9 @@ func checkMemUsageList(num int) {
 }
 
 func checkMemUsageMap(num int) {
-	log.Println("------- check memory usage of in-memory canpnp stored in Go map -----")
-	fmt.Printf("stored data size:%v bytes \n", dataLenInBlock())
-	fmt.Printf("number of message:%v\n", humanize.Comma(int64(num)))
+	log.Info("------- check memory usage of in-memory canpnp stored in Go map -----")
+	log.Infof("stored data size:%v bytes", dataLenInBlock())
+	log.Infof("number of message:%v", humanize.Comma(int64(num)))
 
 	var memStart runtime.MemStats
 	runtime.ReadMemStats(&memStart)
@@ -58,24 +58,24 @@ func checkMemUsageMap(num int) {
 }
 
 func checkMemUsageListEncoded(num int) {
-	log.Println("------- check memory usage of in-memory encoded canpnp list -----")
-	fmt.Printf("stored data size:%v bytes \n", dataLenInBlock())
-	fmt.Printf("number of message:%v\n", humanize.Comma(int64(num)))
+	log.Info("------- check memory usage of in-memory encoded canpnp list -----")
+	log.Infof("stored data size:%v bytes", dataLenInBlock())
+	log.Infof("number of message:%v", humanize.Comma(int64(num)))
 
 	// allocate memory
 	bufSize := (num * tlogBlockSize()) + 100
 	bs := make([]byte, bufSize)
 	buf := bytes.NewBuffer(bs)
 
-	fmt.Printf("buffer size:%v bytes -> it is not Go dependent, but capnp dependent\n", humanize.Comma(int64(bufSize)))
+	log.Infof("buffer size:%v bytes -> it is not Go dependent, but capnp dependent\n", humanize.Comma(int64(bufSize)))
 
 	var memBuf runtime.MemStats
 	runtime.ReadMemStats(&memBuf)
 
-	fmt.Printf("total memory allocation:\n")
-	fmt.Printf("\tbuffer: %v bytes\n",
+	log.Info("total memory allocation:")
+	log.Infof("\tbuffer: %v bytes",
 		humanize.Comma(int64(memBuf.TotalAlloc)))
-	fmt.Printf("\tbuffer overhead: %v bytes\n",
+	log.Infof("\tbuffer overhead: %v bytes",
 		humanize.Comma(int64(memBuf.TotalAlloc-uint64(bufSize))))
 
 	buf.Truncate(0)
@@ -87,7 +87,7 @@ func checkMemUsageListEncoded(num int) {
 	runtime.ReadMemStats(&memWrite)
 
 	allocated := memWrite.TotalAlloc - memBuf.TotalAlloc
-	fmt.Printf("\tcapnp encode:%v bytes\n", humanize.Comma(int64(allocated)))
+	log.Infof("\tcapnp encode:%v bytes", humanize.Comma(int64(allocated)))
 
 	// decode it
 	_, blocks, err := decodeAggBlocks(buf)
@@ -99,7 +99,7 @@ func checkMemUsageListEncoded(num int) {
 	runtime.ReadMemStats(&memRead)
 
 	allocated = memRead.TotalAlloc - memWrite.TotalAlloc
-	fmt.Printf("\tcapnp decode:%v bytes\n", humanize.Comma(int64(allocated)))
+	log.Infof("\tcapnp decode:%v bytes", humanize.Comma(int64(allocated)))
 
 	// make sure we can really decode it
 	for i := 0; i < num; i++ {
@@ -117,15 +117,15 @@ func checkMemUsageMapEncoded(num int) {
 	}
 
 	bufSize := tlogBlockSize() * num
-	fmt.Printf("buffer size:%v bytes -> it is not Go dependent, but capnp dependent\n", humanize.Comma(int64(bufSize)))
+	log.Infof("buffer size:%v bytes -> it is not Go dependent, but capnp dependent", humanize.Comma(int64(bufSize)))
 
 	var memMap runtime.MemStats
 	runtime.ReadMemStats(&memMap)
 
-	fmt.Printf("total memory allocation:\n")
-	fmt.Printf("\tmap of buffer: %v bytes\n",
+	log.Info("total memory allocation:")
+	log.Infof("\tmap of buffer: %v bytes",
 		humanize.Comma(int64(memMap.TotalAlloc)))
-	fmt.Printf("\tbuffer overhead: %v bytes\n",
+	log.Infof("\tbuffer overhead: %v bytes",
 		humanize.Comma(int64(memMap.TotalAlloc-uint64(bufSize))))
 
 	// encode it
@@ -139,14 +139,14 @@ func checkMemUsageMapEncoded(num int) {
 	runtime.ReadMemStats(&memEncode)
 
 	allocated := memEncode.TotalAlloc - memMap.TotalAlloc
-	fmt.Printf("\tcapnp encode:%v bytes\n", humanize.Comma(int64(allocated)))
+	log.Infof("\tcapnp encode:%v bytes", humanize.Comma(int64(allocated)))
 
 	// decode it
 	for i := 0; i < num; i++ {
 		buf := bytes.NewBuffer(container[i])
 		block, err := decodeBlock(buf)
 		if err != nil {
-			log.Fatalf("failed to decode block: %v :%v\n", i, err)
+			log.Fatalf("failed to decode block: %v :%v", i, err)
 		}
 
 		// check some of it, no need to check all
@@ -158,10 +158,10 @@ func checkMemUsageMapEncoded(num int) {
 }
 
 func printMemDif(memStart, memEnd runtime.MemStats) {
-	fmt.Printf("memory stats:\n")
-	fmt.Printf("\ttotal alloc : %v\n", formatMemValue(memEnd.TotalAlloc-memStart.TotalAlloc))
-	fmt.Printf("\theap in use : %v\n", formatMemValue(memEnd.HeapInuse-memStart.HeapInuse))
-	fmt.Printf("\tstack in use : %v\n", formatMemValue(memEnd.StackInuse-memStart.StackInuse))
+	log.Info("memory stats:")
+	log.Infof("\ttotal alloc : %v", formatMemValue(memEnd.TotalAlloc-memStart.TotalAlloc))
+	log.Infof("\theap in use : %v", formatMemValue(memEnd.HeapInuse-memStart.HeapInuse))
+	log.Infof("\tstack in use : %v", formatMemValue(memEnd.StackInuse-memStart.StackInuse))
 }
 
 func formatMemValue(val uint64) string {
@@ -169,8 +169,8 @@ func formatMemValue(val uint64) string {
 	return humanize.BigBytes(x)
 }
 func printMemUsage(mem runtime.MemStats) {
-	fmt.Printf("alloc       : %v bytes\n", humanize.Comma(int64(mem.Alloc)))
-	fmt.Printf("total alloc : %v bytes\n", humanize.Comma(int64(mem.TotalAlloc)))
-	fmt.Printf("heap alloc  : %v bytes\n", humanize.Comma(int64(mem.HeapAlloc)))
-	fmt.Printf("heap sys    : %v bytes\n", humanize.Comma(int64(mem.HeapSys)))
+	log.Infof("alloc       : %v bytes", humanize.Comma(int64(mem.Alloc)))
+	log.Infof("total alloc : %v bytes", humanize.Comma(int64(mem.TotalAlloc)))
+	log.Infof("heap alloc  : %v bytes", humanize.Comma(int64(mem.HeapAlloc)))
+	log.Infof("heap sys    : %v bytes", humanize.Comma(int64(mem.HeapSys)))
 }

@@ -2,9 +2,9 @@ package main
 
 import (
 	"bytes"
-	"fmt"
 	"io"
-	"log"
+
+	log "github.com/Sirupsen/logrus"
 
 	"zombiezen.com/go/capnproto2"
 )
@@ -38,13 +38,13 @@ func writeBlock(buf *bytes.Buffer, i int) error {
 func decodeBlock(buf *bytes.Buffer) (*TlogBlock, error) {
 	msg, err := capnp.NewDecoder(buf).Decode()
 	if err != nil {
-		log.Printf("decode failed :%v\n", err)
+		log.Infof("decode failed: %v", err)
 		return nil, err
 	}
 
 	block, err := ReadRootTlogBlock(msg)
 	if err != nil {
-		log.Printf("decode failed to read root block:%v\n", err)
+		log.Warnf("decode failed to read root block: %v", err)
 	}
 	return &block, err
 }
@@ -79,14 +79,14 @@ func createList(num int) (*capnp.Message, error) {
 
 // write tlog blocks to capnp list
 func writeList(num int, w io.Writer) error {
-	fmt.Println("create capnp messages aggregation...")
+	log.Info("create capnp messages aggregation...")
 	aggMsg, err := createList(num)
 	if err != nil {
 		return err
 	}
 
 	// write capnp msg
-	fmt.Println("write capnp messages to file/memory...")
+	log.Info("write capnp messages to file/memory...")
 	return capnp.NewEncoder(w).Encode(aggMsg)
 }
 
@@ -104,6 +104,7 @@ func decodeAggBlocks(r io.Reader) (*TlogAggregation, *TlogBlock_List, error) {
 	blocks, err := agg.Blocks()
 	return &agg, &blocks, err
 }
+
 func setBlockVal(block *TlogBlock, val int) {
 	block.SetSequence(uint64(val))
 
@@ -115,7 +116,7 @@ func setBlockVal(block *TlogBlock, val int) {
 
 func checkBlockVal(block *TlogBlock, val int) {
 	if block.Sequence() != uint64(val) {
-		log.Fatalf("invalid sequence. expected:%v, got:%v", val, block.Sequence())
+		log.Fatalf("invalid sequence. expected: %v, got: %v", val, block.Sequence())
 	}
 }
 

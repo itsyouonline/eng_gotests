@@ -2,10 +2,10 @@ package main
 
 import (
 	"flag"
-	"fmt"
-	"log"
 	"os"
 	"syscall"
+
+	log "github.com/Sirupsen/logrus"
 )
 
 var (
@@ -36,8 +36,8 @@ func main() {
 	flag.Parse()
 
 	if !mmapList && !mmapOne && !memList && !memMap && !memListEncoded && !memMapEncoded && !loadFile && !loadFileMmap {
-		fmt.Println("please specify test to perform")
-		fmt.Println("run with '-h' option to see all available tests")
+		log.Info("please specify test to perform")
+		log.Info("run with '-h' option to see all available tests")
 		return
 	}
 
@@ -45,13 +45,13 @@ func main() {
 
 	if mmapList {
 		if err := writeListRead(num); err != nil {
-			log.Printf("err = %v\n", err)
+			log.Infof("err = %v", err)
 		}
 	}
 
 	if mmapOne {
 		if err := writeOneReadOne(num); err != nil {
-			log.Printf("writeOneReadOn err = %v\n", err)
+			log.Infof("writeOneReadOn err = %v", err)
 		}
 	}
 

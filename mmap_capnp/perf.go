@@ -3,12 +3,12 @@ package main
 import (
 	"bufio"
 	"bytes"
-	"fmt"
 	"io"
-	"log"
 	"os"
 	"syscall"
 	"time"
+
+	log "github.com/Sirupsen/logrus"
 
 	"github.com/dustin/go-humanize"
 )
@@ -44,10 +44,10 @@ func perfLoadFile(num int, isMmap bool) {
 		_ = blocks.At(i)
 	}
 
-	fmt.Printf("number of messages:%v\n", humanize.Comma(int64(num)))
-	fmt.Printf("mmap : %v\n", isMmap)
-	fmt.Printf("file size:%v bytes\n", humanize.Comma(getFileSize(f)))
-	fmt.Printf("time:%v seconds\n", time.Since(start).Seconds())
+	log.Infof("number of messages: %v", humanize.Comma(int64(num)))
+	log.Infof("mmap: %v", isMmap)
+	log.Infof("file size: %v bytes", humanize.Comma(getFileSize(f)))
+	log.Infof("time: %v seconds", time.Since(start).Seconds())
 }
 
 func getReader(f *os.File, isMmap bool) (io.Reader, error) {
@@ -73,10 +73,11 @@ func createCapnpFile(filename string, num int) (*os.File, error) {
 	return f, writeList(num, w)
 }
 
+// getFileSize returns the size of a file. If there is an error, the program exits
 func getFileSize(f *os.File) int64 {
 	fi, err := f.Stat()
 	if err != nil {
-		log.Fatalf("failed to get file size of '%v' err:%v", f.Name, err)
+		log.Fatalf("failed to get file size of '%v' err:%v", f.Name(), err)
 	}
 	return fi.Size()
 }
