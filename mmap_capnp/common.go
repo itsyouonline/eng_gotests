@@ -3,11 +3,39 @@ package main
 import (
 	"bytes"
 	"io"
+	"os"
+	"syscall"
 
 	log "github.com/Sirupsen/logrus"
 
 	"zombiezen.com/go/capnproto2"
 )
+
+// create mmap'ed file with given size
+func createMemMap(size int) (*os.File, []byte, error) {
+	// create mem mapped file
+	f, err := os.Create("/tmp/capnp_mmap")
+	if err != nil {
+		return nil, nil, err
+	}
+
+	if _, err := f.Seek(int64(size-1), 0); err != nil {
+		f.Close()
+		return nil, nil, err
+	}
+	_, err = f.Write([]byte(" "))
+	if err != nil {
+		f.Close()
+		return nil, nil, err
+	}
+
+	data, err := syscall.Mmap(int(f.Fd()), 0, size, syscall.PROT_WRITE|syscall.PROT_READ, syscall.MAP_SHARED)
+	if err != nil {
+		f.Close()
+		return nil, nil, err
+	}
+	return f, data, nil
+}
 
 func createBlock(i int) (*TlogBlock, *capnp.Message, error) {
 	// create block
