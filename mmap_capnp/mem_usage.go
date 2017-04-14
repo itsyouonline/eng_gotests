@@ -44,8 +44,8 @@ func checkMemUsageList(num int) {
 // in memory in a map. Note that the messages aren't encoded
 func checkMemUsageMap(num int) {
 	log.Info("------- check memory usage of in-memory canpnp stored in Go map -----")
-	log.Infof("stored data size:%v bytes", dataLenInBlock())
-	log.Infof("number of message:%v", humanize.Comma(int64(num)))
+	log.Infof("stored data size: %v bytes", dataLenInBlock())
+	log.Infof("number of message: %v", humanize.Comma(int64(num)))
 
 	// save the current memory usage
 	var memStart runtime.MemStats
