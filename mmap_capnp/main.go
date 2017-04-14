@@ -6,6 +6,7 @@ import (
 	log "github.com/Sirupsen/logrus"
 )
 
+// declare the vars to hold the flags
 var (
 	mmapList       bool
 	mmapOne        bool
@@ -20,6 +21,7 @@ var (
 )
 
 func main() {
+	// declare our flags
 	flag.BoolVar(&mmapList, "mmap-list", false, "write & read capnp list from mmap'ed file")
 	flag.BoolVar(&mmapOne, "mmap-one", false, "write one  and read one capnp from mmap'ed file")
 	flag.BoolVar(&memList, "mem-list", false, "check memory usage of capnp list")
@@ -31,15 +33,20 @@ func main() {
 	flag.IntVar(&optDataLen, "data-len", 0, "number of bytes of data to add to the capnp message(default = 0)")
 	flag.IntVar(&optNum, "num", 1000*1000, "number of messages (default = 1M)")
 
+	// and parse them
 	flag.Parse()
 
+	// we should run at least one test
 	if !mmapList && !mmapOne && !memList && !memMap && !memListEncoded && !memMapEncoded && !loadFile && !loadFileMmap {
 		log.Info("please specify test to perform")
 		log.Info("run with '-h' option to see all available tests")
 		return
 	}
 
+	// get the amount of tlog blocks we want to use from the package lvl variable
 	num := optNum
+
+	// run the enabled tests
 
 	if mmapList {
 		if err := writeListRead(num); err != nil {
@@ -57,13 +64,13 @@ func main() {
 		checkMemUsageList(num)
 	}
 	if memMap {
-		checkMemUsageMap(num / 10)
+		checkMemUsageMap(num)
 	}
 	if memListEncoded {
 		checkMemUsageListEncoded(num)
 	}
 	if memMapEncoded {
-		checkMemUsageMapEncoded(num / 1000)
+		checkMemUsageMapEncoded(num)
 	}
 	if loadFile {
 		perfLoadFile(num, false)
