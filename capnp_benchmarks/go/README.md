@@ -45,7 +45,7 @@ cd client
 
 When a client gets started, it will automatically connect to the server and start the benchmarks. At the end of each benchmark, the time taken gets printed in the terminal. Once the benchmarks are done, the client exits.
 
-For more details on both the client and the server, see the `readme.md` files in their respective directories.
+For more details on both the client and the server, see the `README.md` files in their respective directories.
 
 
 
