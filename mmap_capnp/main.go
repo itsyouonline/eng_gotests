@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"runtime/pprof"
 	"syscall"
 )
 
@@ -19,6 +20,8 @@ var (
 	loadFileMmap   bool
 	optDataLen     int
 	optNum         int
+	cpuProf        bool
+	heapProf       bool
 )
 
 func main() {
@@ -32,6 +35,8 @@ func main() {
 	flag.BoolVar(&loadFileMmap, "load-file-mmap", false, "load mmap'ed file")
 	flag.IntVar(&optDataLen, "data-len", 0, "number of bytes of data to add to the capnp message(default = 0)")
 	flag.IntVar(&optNum, "num", 1000*1000, "number of messages (default = 1M)")
+	flag.BoolVar(&cpuProf, "cpu-prof", false, "cpu profiling")
+	flag.BoolVar(&heapProf, "heap-prof", false, "heap profiling")
 
 	flag.Parse()
 
@@ -39,6 +44,15 @@ func main() {
 		fmt.Println("please specify test to perform")
 		fmt.Println("run with '-h' option to see all available tests")
 		return
+	}
+
+	if cpuProf {
+		f, err := os.Create("app.cpuprof")
+		if err != nil {
+			log.Fatalf("failed to create profiling file:%v", err)
+		}
+		pprof.StartCPUProfile(f)
+		defer pprof.StopCPUProfile()
 	}
 
 	num := optNum
@@ -73,6 +87,15 @@ func main() {
 	}
 	if loadFileMmap {
 		perfLoadFile(num, true)
+	}
+
+	if heapProf {
+		f, err := os.Create("app.mprof")
+		if err != nil {
+			log.Fatal(err)
+		}
+		pprof.WriteHeapProfile(f)
+		f.Close()
 	}
 }
 
