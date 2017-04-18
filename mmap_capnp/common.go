@@ -42,7 +42,7 @@ func createMemMap(size int) (*os.File, []byte, error) {
 // createBlock creates a new tlog block and sets the sequence
 func createBlock(i int) (*TlogBlock, *capnp.Message, error) {
 	segmentBuf := make([]byte, 0, segmentBufferSize())
-	// create block
+	// create a message
 	msg, seg, err := capnp.NewMessage(capnp.SingleSegment(segmentBuf))
 	if err != nil {
 		return nil, nil, err

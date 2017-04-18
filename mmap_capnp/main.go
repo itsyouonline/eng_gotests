@@ -2,10 +2,8 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"os"
 	"runtime/pprof"
-	"syscall"
 
 	log "github.com/Sirupsen/logrus"
 )
@@ -54,7 +52,7 @@ func main() {
 	if cpuProf {
 		f, err := os.Create("app.cpuprof")
 		if err != nil {
-			log.Fatalf("failed to create profiling file:%v", err)
+			log.Fatalf("failed to create profiling file: %v", err)
 		}
 		pprof.StartCPUProfile(f)
 		defer pprof.StopCPUProfile()
