@@ -49,12 +49,19 @@ func main() {
 		return
 	}
 
+	// enable cpu profiling if the plag is set
 	if cpuProf {
+		// dump profile in this file to later use with `go tool pprof`
 		f, err := os.Create("app.cpuprof")
 		if err != nil {
+			// Exit if we cant create the profile
 			log.Fatalf("failed to create profiling file: %v", err)
 		}
+		// close file when we are done
+		defer f.Close()
+		// start profile
 		pprof.StartCPUProfile(f)
+		// make sure we stop the profiling
 		defer pprof.StopCPUProfile()
 	}
 
@@ -95,12 +102,18 @@ func main() {
 		perfLoadFile(num, true)
 	}
 
+	// dump the heap profile if the flag is set
 	if heapProf {
+		// create file to dump the profile
 		f, err := os.Create("app.mprof")
 		if err != nil {
-			log.Fatal(err)
+			// exit if the file can't be created. not that the tests will already be done
+			// since this is the last statement in the main function
+			log.Fatalf("failed to create profiling file: %v", err)
 		}
+		// dump the heap profile
 		pprof.WriteHeapProfile(f)
+		// close the file
 		f.Close()
 	}
 }

@@ -141,34 +141,34 @@ func checkMemUsageMapEncoded(num int) {
 	var baseMem runtime.MemStats
 	runtime.ReadMemStats(&baseMem)
 
+	// initialize our map
 	container := make(map[int][]byte, num)
-	for i := 0; i < num; i++ {
-		container[i] = make([]byte, tlogBlockSize()+30)
-	}
 
 	// record the memory usage after our map allocation
 	var memMap runtime.MemStats
 	runtime.ReadMemStats(&memMap)
 
-	bufSize := (tlogBlockSize() + 30) * num
-	log.Infof("buffer size: %v bytes -> it is not Go dependent, but capnp dependent", humanize.Comma(int64(bufSize)))
-
-	log.Info("total memory allocation:")
+	log.Info("total memory allocation for our map (overhead):")
 	log.Infof("\tmap of buffer: %v bytes",
 		humanize.Comma(int64(memMap.TotalAlloc-baseMem.TotalAlloc)))
-	log.Infof("\tbuffer overhead: %v bytes",
-		humanize.Comma(int64(memMap.TotalAlloc-baseMem.TotalAlloc-uint64(bufSize))))
 
+	// create a new buffer
+	buf := new(bytes.Buffer)
 	// fill our map with encoded blocks
 	for i := 0; i < num; i++ {
-		buf := bytes.NewBuffer(container[i])
-		buf.Truncate(0)
+		// make sure the buffer is empty
+		buf.Reset()
+		// write the block in the buffer
 		writeBlock(buf, i)
+		// set the byteslice with the encoded block in the map
+		// since we want to reuse the buffer and thus the slice, we need to allocate
+		// a new slice and copy the buffer contents
+		container[i] = make([]byte, buf.Len(), buf.Len())
+		copy(container[i], buf.Bytes())
 	}
 
-	// record memory usage now that we encoded the blocks. This memory usage does
-	// not include the blocks since we already allocated space for them when we
-	// initialized the map
+	// record memory usage now that we encoded the blocks. also includes memory used
+	// by the encoded blocks
 	var memWrite runtime.MemStats
 	runtime.ReadMemStats(&memWrite)
 
@@ -184,7 +184,7 @@ func checkMemUsageMapEncoded(num int) {
 		}
 
 		// check some of it, no need to check all
-		// only make sure we did encode/decode corretly
+		// only make sure we did encode/decode correctly
 		if i < 10 {
 			checkBlockVal(block, i)
 		}
