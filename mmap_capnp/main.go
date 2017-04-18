@@ -2,6 +2,10 @@ package main
 
 import (
 	"flag"
+	"fmt"
+	"os"
+	"runtime/pprof"
+	"syscall"
 
 	log "github.com/Sirupsen/logrus"
 )
@@ -18,6 +22,8 @@ var (
 	loadFileMmap   bool
 	optDataLen     int
 	optNum         int
+	cpuProf        bool
+	heapProf       bool
 )
 
 func main() {
@@ -32,6 +38,8 @@ func main() {
 	flag.BoolVar(&loadFileMmap, "load-file-mmap", false, "load mmap'ed file")
 	flag.IntVar(&optDataLen, "data-len", 0, "number of bytes of data to add to the capnp message(default = 0)")
 	flag.IntVar(&optNum, "num", 1000*1000, "number of messages (default = 1M)")
+	flag.BoolVar(&cpuProf, "cpu-prof", false, "cpu profiling")
+	flag.BoolVar(&heapProf, "heap-prof", false, "heap profiling")
 
 	// and parse them
 	flag.Parse()
@@ -41,6 +49,15 @@ func main() {
 		log.Info("please specify test to perform")
 		log.Info("run with '-h' option to see all available tests")
 		return
+	}
+
+	if cpuProf {
+		f, err := os.Create("app.cpuprof")
+		if err != nil {
+			log.Fatalf("failed to create profiling file:%v", err)
+		}
+		pprof.StartCPUProfile(f)
+		defer pprof.StopCPUProfile()
 	}
 
 	// get the amount of tlog blocks we want to use from the package lvl variable
@@ -72,10 +89,20 @@ func main() {
 	if memMapEncoded {
 		checkMemUsageMapEncoded(num)
 	}
+
 	if loadFile {
 		perfLoadFile(num, false)
 	}
 	if loadFileMmap {
 		perfLoadFile(num, true)
+	}
+
+	if heapProf {
+		f, err := os.Create("app.mprof")
+		if err != nil {
+			log.Fatal(err)
+		}
+		pprof.WriteHeapProfile(f)
+		f.Close()
 	}
 }

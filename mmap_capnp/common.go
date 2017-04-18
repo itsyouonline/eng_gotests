@@ -41,8 +41,9 @@ func createMemMap(size int) (*os.File, []byte, error) {
 
 // createBlock creates a new tlog block and sets the sequence
 func createBlock(i int) (*TlogBlock, *capnp.Message, error) {
-	// create capnp message
-	msg, seg, err := capnp.NewMessage(capnp.SingleSegment(nil))
+	segmentBuf := make([]byte, 0, segmentBufferSize())
+	// create block
+	msg, seg, err := capnp.NewMessage(capnp.SingleSegment(segmentBuf))
 	if err != nil {
 		return nil, nil, err
 	}
@@ -175,4 +176,8 @@ func dataLenInBlock() int {
 	len := 8 /* sequence */ + 4 /* capnp overhead */
 	len += optDataLen           /* text */
 	return len
+}
+
+func segmentBufferSize() int {
+	return 8*((dataLenInBlock()/8)+1) + 10
 }
