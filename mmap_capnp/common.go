@@ -127,5 +127,5 @@ func dataLenInBlock() int {
 }
 
 func segmentBufferSize() int {
-	return 8*((dataLenInBlock()/8)+1) + 10
+	return 8*((dataLenInBlock()/8)+1) + 20
 }
