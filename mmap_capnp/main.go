@@ -59,7 +59,7 @@ func main() {
 		checkMemUsageList(num)
 	}
 	if memMap {
-		checkMemUsageMap(num / 10)
+		checkMemUsageMap(num)
 	}
 	if memListEncoded {
 		checkMemUsageListEncoded(num)
@@ -67,6 +67,7 @@ func main() {
 	if memMapEncoded {
 		checkMemUsageMapEncoded(num / 1000)
 	}
+
 	if loadFile {
 		perfLoadFile(num, false)
 	}
