@@ -1,4 +1,4 @@
-// package declaration, this file is in the `main` package
+// package declaration
 package main
 
 // import other packages we want to use
@@ -23,6 +23,7 @@ import (
 // main is the program entry point
 func main() {
 	// create a new app in the cli library
+	// we use the `:=` operator to both declare and assign a new variable in one line
 	app := cli.NewApp()
 	// set the app name
 	app.Name = "Capnp test client"
