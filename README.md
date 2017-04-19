@@ -7,7 +7,7 @@ for different tests, e.g. all the mmap code is in onde subdirectory, and the red
 
 First create the directory structure:
 ```bash
-mkdir $GOPATH/src/docs.greenitglobe.com/despiegk
+mkdir -p $GOPATH/src/docs.greenitglobe.com/despiegk
 ```
 
 Go looks for packages we import in very specific places, therefore it is important
@@ -17,6 +17,7 @@ Now clone our repo with the sources:
 ```bash
 cd $GOPATH/src/docs.greenitglobe.com/despiegk
 git clone ssh://git@docs.greenitglobe.com:10022/despiegk/gotests.git
+cd gotests
 ```
 
 ***Optional***: if code need to be run on a branch other than master, we first need to
@@ -27,7 +28,6 @@ git checkout BRANCH_NAME
 
 As a last step, we need to download the dependencies:
 ```bash
-cd gotests
 go get ./...
 ```
 
