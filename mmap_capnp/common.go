@@ -123,7 +123,7 @@ func createList(num int) (*capnp.Message, error) {
 	return aggMsg, nil
 }
 
-// writeList creates a new TlogAggregation, writes the designated amount of tlogBlockSize
+// writeList creates a new TlogAggregation, writes the designated amount of tlog blocks
 // to the aggregations list, encodes it, and writes it to the provided writer.
 func writeList(num int, w io.Writer) error {
 	log.Info("create capnp messages aggregation...")
