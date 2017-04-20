@@ -20,18 +20,15 @@ git clone ssh://git@docs.greenitglobe.com:10022/despiegk/gotests.git
 cd gotests
 ```
 
-***Optional***: if code need to be run on a branch other than master, we first need to
-switch to said branch.
-```bash
-git checkout BRANCH_NAME
-```
-
 As a last step, we need to download the dependencies:
 ```bash
 go get ./...
 ```
 
 When this is done, we have all the required code to start building
+
+Note that none code dependencies (such as the tarantool server, etc...) install
+instructions can be found in the README.md files in the respective sub directories
 
 ## building
 
