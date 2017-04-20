@@ -1,0 +1,4 @@
+tarantool_perf
+*.xlog
+*.vylog
+*.snap
