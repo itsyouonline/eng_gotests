@@ -49,7 +49,7 @@ Third column: the total amount of actual data we store
 Remainder: the size of the respective data structure to store said data.
 
 | number of messages | actual data in bytes per message| total data in bytes | capnp list | encoded capnp list |  capnp list with buf | encoded capnp list with buf | slice with messages | slice with encoded data |
-|:---|:---:|:---:|---:|---:|---:|---:|---:|---:|---:|
+|:---|:---:|:---:|---:|---:|---:|---:|---:|---:|
 | 1.000 | 12 B | 12 KB | 41 KB | 57 KB | 33 KB | 49 KB | 262 KB | 425 KB |
 | 10.000 | 12 B | 120 KB | 172 KB | 336 KB | 328 KB | 492 KB | 2,8 MB | 1,6 MB |
 | 100.000 | 12 B | 1,2 MB | 1,6 MB | 3,2 MB | 3,2 MB | 4,7 MB | 25,8 MB | 8,0 MB |
