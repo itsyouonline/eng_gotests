@@ -91,8 +91,10 @@ func decodeBlock(buf *bytes.Buffer) (*TlogBlock, error) {
 // createList creates the defined amount of TlogBlocks, stored in a capnp list
 // wrapped in a TlogAggregation.
 func createList(num int) (*capnp.Message, error) {
+	// create an empty byte slice and estimate its total size to increase performance
+	buf := make([]byte, 0, 100+num*(tlogBlockSize()+20))
 	// create a new capnp message
-	aggMsg, aggSeg, err := capnp.NewMessage(capnp.SingleSegment(nil))
+	aggMsg, aggSeg, err := capnp.NewMessage(capnp.SingleSegment(buf))
 	if err != nil {
 		return nil, err
 	}
