@@ -91,8 +91,10 @@ actual amount of stored data per message is low. As soon as we approach ~100 byt
 per message, efficiency increases to the point where it seems similar to our list.
 The benefit of our slice is that messages are kept separate, whereas they are combined
 into 1 message with our list approach. As soon as the message with the list gets above
-about 250 MB in size, the library refuses to decode it back. The slice could potentially store
-gigabytes worth of data. Whichever approach is better will probably depend on the
+about 250 MB in size, the library refuses to decode it back. This problem can be solved
+by usging a `multi segment message`, but this seems to require some additional work
+to manually manage the segments. The slice could potentially store gigabytes worth of data
+without any extra effort. Whichever approach is better will probably depend on the
 requirements of the application, either estimating the size of the objects to be
 generated and creating a list with a buffer of said size, or storing the (possibly
 encoded) messages separately in a slice.
