@@ -1,5 +1,5 @@
--- listen to port 3301
-box.cfg{listen = 3301}
+-- listen to port 3302
+box.cfg{listen = 3302}
 
 -- create our space
 -- it only IN MEMORY space
@@ -12,6 +12,5 @@ box.space.xxx:create_index('id', {parts = {1, 'int'}, type='HASH'})
 -- you don't want this kind of access in production
 box.schema.user.grant('guest', 'read,write,execute', 'universe')
 
--- just test 
+-- just test
 box.space.xxx:put{-1, "anu"}
-
