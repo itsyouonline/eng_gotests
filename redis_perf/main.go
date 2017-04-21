@@ -102,7 +102,7 @@ func main() {
 
 		log.Debug("Connect to redis server at address ", dbConnectionString)
 
-		client := redis.NewGoRedisClient(dbConnectionString, redis.Tcp)
+		client := redis.NewGoRedisClient(dbConnectionString, conType)
 		err := perf.StoreDataHSetRandom(objectAmount, dataSize, client)
 		return err
 	}
