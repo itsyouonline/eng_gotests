@@ -2,7 +2,8 @@ package redis
 
 import (
 	"fmt"
-	"log"
+
+	log "github.com/Sirupsen/logrus"
 )
 
 // RedisClient is an interface defining all methods our custom redis client wrappers must implement
