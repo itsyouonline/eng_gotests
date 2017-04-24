@@ -35,6 +35,9 @@ func NewRedisClient(clientType, connectionAddr string, conType ConnectionType) R
 	case "redigo":
 		client = newRedigoClient(connectionAddr, conType)
 		break
+	case "radix":
+		client = newRadixClient(connectionAddr, conType)
+		break
 	default:
 		log.Fatal(clientType, " is not a recognized client.")
 	}

@@ -57,7 +57,7 @@ func main() {
 		},
 		cli.StringFlag{
 			Name:        "client",
-			Usage:       "The underlying client to use in tests to connect to redis. \"go-redis\" and \"redigo\" are allowed",
+			Usage:       "The underlying client to use in tests to connect to redis. \"go-redis\", \"redigo\" and \"radix\" are allowed",
 			Value:       "go-redis",
 			Destination: &clientType,
 		},
