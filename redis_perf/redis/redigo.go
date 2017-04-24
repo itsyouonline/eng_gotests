@@ -27,7 +27,7 @@ func newRedigoClient(connectionAddr string, conType ConnectionType) RedisClient 
 }
 
 func (rc RedigoClient) String() string {
-	return "go-redis - connection: " + rc.network
+	return "redigo - connection: " + rc.network
 }
 
 func (rc RedigoClient) Ping() error {
@@ -37,10 +37,7 @@ func (rc RedigoClient) Ping() error {
 
 func (rc RedigoClient) StoreInHset(key, field string, value []byte) error {
 	_, err := rc.conn.Do("HSET", key, field, value)
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }
 
 func (rc RedigoClient) GetFromHset(key, field string) ([]byte, error) {
