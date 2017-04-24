@@ -119,7 +119,7 @@ func main() {
 		if pipelength <= 0 {
 			err = perf.StoreDataHSetRandom(objectAmount, dataSize, client)
 		} else {
-			err = perf.StoreDataHSetPipeRandom(objectAmount, 10000, dataSize, client)
+			err = perf.StoreDataHSetPipeRandom(objectAmount, pipelength, dataSize, client)
 		}
 		return err
 	}
