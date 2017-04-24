@@ -14,8 +14,10 @@ type RedisClient interface {
 	Ping() error
 	// StoreInHset stores value in an hset with the designated key in the designated field
 	StoreInHset(key, field string, value []byte) error
-	// GetFromHset
+	// GetFromHset gets a value fron an hset with the designated key from the designated field
 	GetFromHset(key, field string) ([]byte, error)
+	// StartPipe returns a new RedisPipe pipeline
+	StartPipe() RedisPipe
 }
 
 type ConnectionType int

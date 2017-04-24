@@ -34,7 +34,7 @@ func main() {
 
 	var debugLogging bool
 	var dbConnectionString, network, clientType string
-	var objectAmount int
+	var objectAmount, pipelength int
 	var conType redis.ConnectionType
 
 	app.Flags = []cli.Flag{
@@ -73,6 +73,12 @@ func main() {
 			Value:       defaultObjectAmount,
 			Destination: &objectAmount,
 		},
+		cli.IntFlag{
+			Name:        "pipelength, p",
+			Usage:       "The amount of statements per pipe. Set to 0 to disable the usage of pipes",
+			Value:       0,
+			Destination: &pipelength,
+		},
 	}
 
 	app.Before = func(c *cli.Context) error {
@@ -109,7 +115,12 @@ func main() {
 		log.Debug("Connect to redis server at address ", dbConnectionString)
 
 		client := redis.NewRedisClient(clientType, dbConnectionString, conType)
-		err := perf.StoreDataHSetRandom(objectAmount, dataSize, client)
+		var err error
+		if pipelength <= 0 {
+			err = perf.StoreDataHSetRandom(objectAmount, dataSize, client)
+		} else {
+			err = perf.StoreDataHSetPipeRandom(objectAmount, 10000, dataSize, client)
+		}
 		return err
 	}
 

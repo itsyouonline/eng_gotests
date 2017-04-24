@@ -12,6 +12,10 @@ type RedigoClient struct {
 	network string
 }
 
+type RedigoPipe struct {
+	conn redis.Conn
+}
+
 // newRedigoClient creates a new redigo client
 func newRedigoClient(connectionAddr string, conType ConnectionType) RedisClient {
 	network := connTypeToString(conType)
@@ -40,6 +44,26 @@ func (rc RedigoClient) StoreInHset(key, field string, value []byte) error {
 	return err
 }
 
+func (rp RedigoPipe) StoreInHset(key, field string, value []byte) error {
+	return rp.conn.Send("HSET", key, field, value)
+}
+
 func (rc RedigoClient) GetFromHset(key, field string) ([]byte, error) {
 	return redis.Bytes(rc.conn.Do("HGET", key, field))
+}
+
+func (rp RedigoPipe) GetFromHset(key, field string) ([]byte, error) {
+	return nil, rp.conn.Send("HGET", key, field)
+}
+
+func (rp RedigoPipe) Execute() ([]byte, error) {
+	// Execute the pipe, don't check the returns
+	err := rp.conn.Flush()
+	return nil, err
+}
+
+func (rc RedigoClient) StartPipe() RedisPipe {
+	return RedigoPipe{
+		conn: rc.conn,
+	}
 }

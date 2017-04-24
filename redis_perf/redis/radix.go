@@ -1,7 +1,7 @@
 package redis
 
 import (
-	"log"
+	log "github.com/Sirupsen/logrus"
 
 	"github.com/mediocregopher/radix.v2/redis"
 )
@@ -10,6 +10,10 @@ import (
 type RadixClient struct {
 	client  *redis.Client
 	network string
+}
+
+type RadixPipe struct {
+	client *redis.Client
 }
 
 // newRadixClient creates a new radix client
@@ -38,10 +42,32 @@ func (rc RadixClient) StoreInHset(key, field string, value []byte) error {
 	return rc.client.Cmd("HSET", key, field, value).Err
 }
 
+func (rp RadixPipe) StoreInHset(key, field string, value []byte) error {
+	rp.client.PipeAppend("HSET", key, field, value)
+	return nil
+}
+
 func (rc RadixClient) GetFromHset(key, field string) ([]byte, error) {
 	resp, err := rc.client.Cmd("HGET", key, field).Bytes()
 	if err != nil {
 		return nil, err
 	}
 	return resp, nil
+}
+
+func (rp RadixPipe) GetFromHset(key, field string) ([]byte, error) {
+	rp.client.PipeAppend("HGET", key, field)
+	return nil, nil
+}
+
+func (rp RadixPipe) Execute() ([]byte, error) {
+	// Execute the pipe, don't check the returns
+	resp := rp.client.PipeResp()
+	return nil, resp.Err
+}
+
+func (rc RadixClient) StartPipe() RedisPipe {
+	return RadixPipe{
+		client: rc.client,
+	}
 }
