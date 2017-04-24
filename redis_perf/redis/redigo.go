@@ -12,7 +12,7 @@ type RedigoClient struct {
 	network string
 }
 
-// newRedigoClient creates a new go redis client
+// newRedigoClient creates a new redigo client
 func newRedigoClient(connectionAddr string, conType ConnectionType) RedisClient {
 	network := connTypeToString(conType)
 

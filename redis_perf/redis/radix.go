@@ -12,6 +12,7 @@ type RadixClient struct {
 	network string
 }
 
+// newRadixClient creates a new radix client
 func newRadixClient(connectionAddr string, conType ConnectionType) RedisClient {
 	network := connTypeToString(conType)
 
