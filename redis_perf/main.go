@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	defaultObjectAmount = 1000
+	defaultObjectAmount = 1000000
 	defaultObjectSize   = 200
 )
 
@@ -70,7 +70,7 @@ func main() {
 		cli.IntFlag{
 			Name:        "object-amount, a",
 			Usage:       "The ammount of objects to be stored in redis",
-			Value:       1000,
+			Value:       defaultObjectAmount,
 			Destination: &objectAmount,
 		},
 	}
