@@ -22,6 +22,7 @@ func StoreDataHSetRandom(amount, size int, client redis.RedisClient) error {
 	log.Debugf("Junk data initialized, data size is %v bytes", len(data))
 	// the key for the HSet
 	key := strconv.FormatInt(time.Now().Unix(), 10)
+	log.Debug("Key is ", key)
 	start := time.Now()
 	for i := 0; i < amount; i++ {
 		if err := client.StoreInHset(key, strconv.Itoa(i), data); err != nil {
@@ -52,6 +53,7 @@ func StoreDataHSetPipeRandom(amount, pipelength, size int, client redis.RedisCli
 	log.Debugf("Junk data initialized, data size is %v bytes", len(data))
 	// the key for the HSet
 	key := strconv.FormatInt(time.Now().Unix(), 10)
+	log.Debug("Key is ", key)
 	start := time.Now()
 	pipe := client.StartPipe()
 	var pipeCounter int
