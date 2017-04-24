@@ -33,7 +33,7 @@ func main() {
 	log.SetOutput(os.Stdout)
 
 	var debugLogging bool
-	var dbConnectionString, network string
+	var dbConnectionString, network, clientType string
 	var objectAmount int
 	var conType redis.ConnectionType
 
@@ -54,6 +54,12 @@ func main() {
 			Usage:       "The type of connection to redis, either tcp or unix",
 			Value:       "tcp",
 			Destination: &network,
+		},
+		cli.StringFlag{
+			Name:        "client",
+			Usage:       "The underlying client to use in tests to connect to redis. \"go-redis\" and \"redigo\" are allowed",
+			Value:       "go-redis",
+			Destination: &clientType,
 		},
 		cli.IntFlag{
 			Name:        "data-size, s",
@@ -88,7 +94,7 @@ func main() {
 			conType = redis.Tcp
 			break
 		case "unix":
-			log.Debug("Clients will try to connect to redis using a raw unix socket")
+			log.Debug("Clients will try to connect to redis using a unix socket")
 			conType = redis.Unix
 			break
 		default:
@@ -102,7 +108,7 @@ func main() {
 
 		log.Debug("Connect to redis server at address ", dbConnectionString)
 
-		client := redis.NewGoRedisClient(dbConnectionString, conType)
+		client := redis.NewRedisClient(clientType, dbConnectionString, conType)
 		err := perf.StoreDataHSetRandom(objectAmount, dataSize, client)
 		return err
 	}

@@ -31,13 +31,13 @@ func benchmarkStoreInHset(client RedisClient, b *testing.B) {
 // BenchmarkStoreInHsetGoRedisTcp benchmarks the StoreInHset function using a go-redis
 // client with a tcp connection
 func BenchmarkStoreInHsetGoRedisTcp(b *testing.B) {
-	client := NewGoRedisClient("localhost:6379", Tcp)
+	client := NewRedisClient("go-redis", "localhost:6379", Tcp)
 	benchmarkStoreInHset(client, b)
 }
 
 // BenchmarkStoreInHsetGoRedisUnix benchmarks the StoreInHset function using a go-redis
 // client with a unix socket
 func BenchmarkStoreInHsetGoRedisUnix(b *testing.B) {
-	client := NewGoRedisClient("/tmp/redis.sock", Unix)
+	client := NewRedisClient("go-redis", "/tmp/redis.sock", Unix)
 	benchmarkStoreInHset(client, b)
 }

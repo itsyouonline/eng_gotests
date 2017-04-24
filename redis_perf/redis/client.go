@@ -1,6 +1,9 @@
 package redis
 
-import "fmt"
+import (
+	"fmt"
+	"log"
+)
 
 // RedisClient is an interface defining all methods our custom redis client wrappers must implement
 type RedisClient interface {
@@ -20,3 +23,36 @@ const (
 	Tcp ConnectionType = iota
 	Unix
 )
+
+// NewRedisClient creates a new RedisClient with the specified clientType. An unknown
+// clientType is a fatal error
+func NewRedisClient(clientType, connectionAddr string, conType ConnectionType) RedisClient {
+	var client RedisClient
+	switch clientType {
+	case "go-redis":
+		client = newGoRedisClient(connectionAddr, conType)
+		break
+	case "redigo":
+		client = newRedigoClient(connectionAddr, conType)
+		break
+	default:
+		log.Fatal(clientType, " is not a recognized client.")
+	}
+	return client
+}
+
+// connTypeToString returns a string representation of a ConnectionType
+func connTypeToString(conType ConnectionType) string {
+	var network string
+	switch conType {
+	case Tcp:
+		network = "tcp"
+		break
+	case Unix:
+		network = "unix"
+		break
+	default:
+		network = "tcp"
+	}
+	return network
+}

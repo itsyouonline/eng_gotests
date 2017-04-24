@@ -4,24 +4,15 @@ import (
 	go_redis "github.com/go-redis/redis"
 )
 
+// GoRedisClient is a wrapper for a "go-redis" client
 type GoRedisClient struct {
 	client  *go_redis.Client
 	network string
 }
 
-// NewGoRedisClient creates a new go redis client
-func NewGoRedisClient(connectionAddr string, conType ConnectionType) RedisClient {
-	var network string
-	switch conType {
-	case Tcp:
-		network = "tcp"
-		break
-	case Unix:
-		network = "unix"
-		break
-	default:
-		network = "tcp"
-	}
+// newGoRedisClient creates a new go redis client
+func newGoRedisClient(connectionAddr string, conType ConnectionType) RedisClient {
+	network := connTypeToString(conType)
 
 	client := go_redis.NewClient(&go_redis.Options{
 		Network:  network,
@@ -36,7 +27,7 @@ func NewGoRedisClient(connectionAddr string, conType ConnectionType) RedisClient
 }
 
 func (rc GoRedisClient) String() string {
-	return "go-redis - network: " + rc.network
+	return "go-redis - connection: " + rc.network
 }
 
 func (rc GoRedisClient) Ping() error {
