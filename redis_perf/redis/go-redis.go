@@ -39,19 +39,11 @@ func (rc GoRedisClient) Ping() error {
 }
 
 func (rc GoRedisClient) StoreInHset(key, field string, value []byte) error {
-	bcmd := rc.client.HSet(key, field, value)
-	if bcmd.Err() != nil {
-		return bcmd.Err()
-	}
-	return nil
+	return rc.client.HSet(key, field, value).Err()
 }
 
 func (rp GoRedisPipe) StoreInHset(key, field string, value []byte) error {
-	bcmd := rp.pipe.HSet(key, field, value)
-	if bcmd.Err() != nil {
-		return bcmd.Err()
-	}
-	return nil
+	return rp.pipe.HSet(key, field, value).Err()
 }
 
 func (rc GoRedisClient) GetFromHset(key, field string) ([]byte, error) {

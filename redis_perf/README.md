@@ -21,8 +21,12 @@ docker run --name testredis -p 6379:6379 -v /tmp:/tmp customredis
 ```
 A docker container will be created and started running redis, with the name testredis.
 In the `/tmp` directory a Unix socket is exposed with the name `redis.sock`. The names
-used here are just an example, and can be changed freely. To clear the storage, the
-container can be stopped, removed, and recreated from the above command.
+used here are just an example, and can be changed freely. To clear the storage, connect to
+the container with the `redis-cli` and execute the `flushall` command:
+```bash
+docker exec -it testredis redis-cli
+flushall
+```
 
 ## usage
 

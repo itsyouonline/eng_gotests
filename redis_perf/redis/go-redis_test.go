@@ -8,8 +8,8 @@ import (
 	log "github.com/Sirupsen/logrus"
 )
 
-// store up to 10K statements before executing them
-const pipelength = 10000
+// store up to 10 statements before executing them
+const pipelength = 10
 
 func benchmarkStoreInHset(client RedisClient, b *testing.B) {
 	// generate 200 bytes of data
