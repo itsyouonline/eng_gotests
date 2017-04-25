@@ -49,3 +49,24 @@ pipe size `-` indicates that no pipe was used.
 | radix.v2 | unix socket | 1 | 11,111 s | 90.001 obj/s |
 | radix.v2 | unix socket | 5 | 4,804 s | 208.160 obj/s |
 | radix.v2 | unix socket | 10 | 3,664 s | 272.926 obj/s |
+
+For these timing results, only the time taken to store the data and check for an
+error while doing so is considered, stored items weren't read from redis.
+
+The results clearly show that unix sockets vastly outperform tcp connections.
+This is especially true when pipes aren't used, as the rtt cost has to be payed
+for every single object. Considering this, unix sockets should always be preferred
+where applicable.
+
+The better client to use is dependent on whether or not pipelining is used, and if so,
+how much commands are used per pipeline. In case no pipeline is used, the redigo and
+radix.v2 clients are roughly tied concerning speed, with go-redis lagging behind.
+
+In case pipelining is used, redigo outperforms the other tested clients. In tests with
+pipelining, the responses are ignored, we only look for errors. Since radix requires us
+to load in every response from the pipeline and check it for an error, it looses a lot of
+performance compared to redigo and go-redis, which get any error from anywhere in the pipe
+when reading the first response or when executing the pipe. They then ignore the actual
+command response, since we know it succeeded anyway as there was no error. In Radix, a
+possible error is part of the response for a command, therefore we must read every response
+in the pipe and check if it has an error.
