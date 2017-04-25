@@ -7,6 +7,8 @@ install on ubuntu 16.04
 bash install_ubuntu.sh
 ```
 
+For other operating systems, see [the official download page](https://tarantool.org/download.html)
+
 ## start tarantool
 
 start tarantool without persistence
@@ -58,7 +60,7 @@ In addition, the following flags are accepted to change the test behaviour:
 ## Tarantool comparison with redis
 
 When asked how to implement a HSet (as in redis), Tarantool developers responded
-the follwing:
+the following:
 
 ```
 hello! tarantool is not key value.
