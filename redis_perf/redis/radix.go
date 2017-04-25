@@ -61,9 +61,16 @@ func (rp RadixPipe) GetFromHset(key, field string) ([]byte, error) {
 }
 
 func (rp RadixPipe) Execute() ([]byte, error) {
-	// Execute the pipe, don't check the returns
-	resp := rp.client.PipeResp()
-	return nil, resp.Err
+	// Execute the pipe, check if there are errors
+	var err error
+	for err == nil {
+		err = rp.client.PipeResp().Err
+	}
+	// ignore pipelineempty errors
+	if err == redis.ErrPipelineEmpty {
+		err = nil
+	}
+	return nil, err
 }
 
 func (rc RadixClient) StartPipe() RedisPipe {

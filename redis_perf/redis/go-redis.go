@@ -63,7 +63,7 @@ func (rp GoRedisPipe) GetFromHset(key, field string) ([]byte, error) {
 }
 
 func (rp GoRedisPipe) Execute() ([]byte, error) {
-	// Execute the pipe, don't check the returns
+	// Execute the pipe, don't check the returns, only possible errors
 	_, err := rp.pipe.Exec()
 	return nil, err
 }

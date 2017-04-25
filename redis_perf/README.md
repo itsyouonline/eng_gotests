@@ -21,7 +21,7 @@ docker run --name testredis -p 6379:6379 -v /tmp:/tmp customredis
 ```
 A docker container will be created and started running redis, with the name testredis.
 In the `/tmp` directory a Unix socket is exposed with the name `redis.sock`. The names
-used here are just an example, and can be changed freely. To clear the storage, connect to
+used here are just an example, and can be changed freely. To clear the memory, connect to
 the container with the `redis-cli` and execute the `flushall` command:
 ```bash
 docker exec -it testredis redis-cli
@@ -41,7 +41,7 @@ The most important flags are:
  - `--client`: the underlying client to use, either `go-redis`, `redigo` or `radix`, default `go-redis`
  - `-p, --pipelength`: the amount of statements to store in a pipe before executing it.
  Setting this to 0 (or any negative number) disables the use of pipes. 0 by default,
- thus disabling pipes. 
+ thus disabling pipes.
 
 
 ## code

@@ -81,7 +81,7 @@ func StoreDataHSetPipeRandom(amount, pipelength, size int, client redis.RedisCli
 	}
 
 	// If the pipe is not empty, execute the remaining statements.
-	if pipeCounter%pipelength == 0 && pipelength == 0 {
+	if pipeCounter%pipelength == 0 && pipeCounter != 0 {
 		_, err := pipe.Execute()
 		if err != nil {
 			log.Error("Error while executing remainder in pipe: ", err)

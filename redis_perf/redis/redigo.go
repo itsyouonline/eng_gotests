@@ -58,7 +58,7 @@ func (rp RedigoPipe) GetFromHset(key, field string) ([]byte, error) {
 
 func (rp RedigoPipe) Execute() ([]byte, error) {
 	// Execute the pipe, don't check the returns
-	err := rp.conn.Flush()
+	_, err := rp.conn.Do("")
 	return nil, err
 }
 
