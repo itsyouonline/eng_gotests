@@ -1,10 +1,10 @@
 package perf
 
 import (
-	"crypto/aes"
-	"crypto/cipher"
 	"crypto/md5"
 	"crypto/rand"
+
+	"docs.greenitglobe.com/despiegk/gotests/encryption_test/crypt"
 
 	log "github.com/Sirupsen/logrus"
 )
@@ -18,47 +18,62 @@ func RandomDataTest(dataLength int) error {
 	md5a := md5.Sum(data)
 	log.Debug(len(md5a), " ", md5a)
 	// log.Debugf("Read %v bytes of random data", read)
-	aes, err := aes.NewCipher(md5a[:])
+	cipher, err := crypt.NewBlockCipher("twofish", md5a[:])
 	if err != nil {
 		log.Fatal(err)
 	}
-	iv := make([]byte, aes.BlockSize())
+
+	iv := make([]byte, cipher.BlockSize())
 	_, err = rand.Read(iv)
 	if err != nil {
 		log.Fatal(err)
 	}
-	cbl := cipher.NewCBCEncrypter(aes, iv)
 
-	//PKCS7 padding
-	paddingsize := aes.BlockSize() - len(data)%aes.BlockSize()
-	padding := make([]byte, paddingsize)
-	// set all the padding bytes to the amount of bytes we add as per the PKCS7
-	for i := range padding {
-		padding[i] = byte(paddingsize)
-	}
-	data = append(data, padding...)
-	dst := make([]byte, len(data))
-	cbl.CryptBlocks(dst, data)
+	dst := crypt.BlockEncrypt("ofb", cipher, data, iv)
 	log.Warn("IV: ", iv)
 	log.Warn("Original data: ", data)
 	log.Warn("Encoded data: ", dst)
-	cbld := cipher.NewCBCDecrypter(aes, iv)
-	dec := make([]byte, len(dst))
-	cbld.CryptBlocks(dec, dst)
+
+	dec := crypt.BlockDecrypt("ofb", cipher, dst, iv)
+
 	log.Warn("Decoded data: ", dec)
 
-	// strip padding
-	// read the last byte of the slice
-	paddingBytes := int(dec[len(dec)-1])
-	padding = dec[len(dec)-paddingBytes:]
-	log.Warn("Padding: ", padding)
-	for _, v := range padding {
-		if int(v) != paddingBytes {
-			log.Fatalf("Wrong value for padding byte, got %v, expected %v", int(v), paddingBytes)
-		}
-	}
-	dec = dec[:len(dec)-paddingBytes]
 	log.Warn("Decoded data with padding stripped: ", dec)
 	log.Info("Decoded message: ", string(dec))
+	return err
+}
+
+func RandomDataTestEverything(dataLength int) error {
+	data := []byte("My super secret test stringy.")
+	ciphers := []string{"aes" /*"3des", */, "twofish", "blowfish"}
+	modes := []string{"cbc", "cfb", "ctr", "ofb"}
+
+	key := make([]byte, 16)
+	_, err := rand.Read(key)
+	if err != nil {
+		log.Fatal(err)
+	}
+	for _, c := range ciphers {
+		cipher, err := crypt.NewBlockCipher(c, key)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		iv := make([]byte, cipher.BlockSize())
+		_, err = rand.Read(iv)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		for _, mode := range modes {
+			log.Info(c, ": ", mode)
+			ciphertext := crypt.BlockEncrypt(mode, cipher, data, iv)
+			log.Warn(ciphertext)
+
+			dec := crypt.BlockDecrypt(mode, cipher, ciphertext, iv)
+			log.Warn(dec)
+			log.Warn(string(dec))
+		}
+	}
 	return err
 }
