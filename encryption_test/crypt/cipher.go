@@ -16,7 +16,12 @@ func NewBlockCipher(block string, key []byte) (cipher.Block, error) {
 	case "aes":
 		return aes.NewCipher(key)
 	case "3des":
-		return des.NewTripleDESCipher(key)
+		// since 3DES requires a 24 byte key and our use case supplies 16 bit keys, just repeat it a bit
+		newkey := make([]byte, 24)
+		for i := range newkey {
+			newkey[i] = key[i%len(key)]
+		}
+		return des.NewTripleDESCipher(newkey)
 	case "blowfish":
 		return blowfish.NewCipher(key)
 	case "twofish":
