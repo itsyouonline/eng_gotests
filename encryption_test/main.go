@@ -42,8 +42,11 @@ func main() {
 
 	app.Action = func(c *cli.Context) error {
 		log.Infoln(app.Name, "version", app.Version)
-		err := perf.RandomDataTestEverything(200)
-		return err
+		err := perf.TestIndividual(200)
+		if err != nil {
+			return err
+		}
+		return perf.TestList(200)
 	}
 
 	app.Run(os.Args)

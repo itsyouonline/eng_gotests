@@ -14,6 +14,7 @@ import (
 type Compressor interface {
 	io.WriteCloser
 	Reset(io.Writer)
+	Flush() error
 }
 
 // NewCompressor returns a new compressor for the given algorithm
