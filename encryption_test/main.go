@@ -23,12 +23,25 @@ func main() {
 	log.SetOutput(os.Stdout)
 
 	var debugLogging bool
+	var dataSize, dataSet int
 
 	app.Flags = []cli.Flag{
 		cli.BoolFlag{
 			Name:        "debug, d",
 			Usage:       "Enable debug logging",
 			Destination: &debugLogging,
+		},
+		cli.IntFlag{
+			Name:        "size, s",
+			Usage:       "Set the amount of random data to store in a block",
+			Value:       200,
+			Destination: &dataSize,
+		},
+		cli.IntFlag{
+			Name:        "amount, a",
+			Usage:       "The amount of blocks to generate in tests",
+			Value:       1000000,
+			Destination: &dataSet,
 		},
 	}
 
@@ -42,11 +55,15 @@ func main() {
 
 	app.Action = func(c *cli.Context) error {
 		log.Infoln(app.Name, "version", app.Version)
-		err := perf.TestIndividual(200)
+		err := perf.TestIndividual(dataSet, dataSize)
 		if err != nil {
 			return err
 		}
-		return perf.TestList(200)
+		err = perf.TestCombined(dataSet, dataSize)
+		if err != nil {
+			return err
+		}
+		return perf.TestList(dataSet, dataSize)
 	}
 
 	app.Run(os.Args)

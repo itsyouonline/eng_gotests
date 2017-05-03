@@ -17,6 +17,7 @@ func NewBlockCipher(block string, key []byte) (cipher.Block, error) {
 		return aes.NewCipher(key)
 	case "3des":
 		// since 3DES requires a 24 byte key and our use case supplies 16 bit keys, just repeat it a bit
+		// this isn't secure, only use this in tests
 		newkey := make([]byte, 24)
 		for i := range newkey {
 			newkey[i] = key[i%len(key)]

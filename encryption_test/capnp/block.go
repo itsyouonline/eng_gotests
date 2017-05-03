@@ -21,6 +21,7 @@ func init() {
 // SetDataSize sets the data size to embed in a tlog block
 func SetDataSize(ds int) {
 	dataSize = ds
+	log.Info("Current amount of actual data in a single block: ", dataLenInBlock())
 }
 
 // GenerateBlocks makes a slice of the desired length filled with encoded capnp messages.
