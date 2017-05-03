@@ -2,3 +2,5 @@ encryption_test
 *.cpuprof
 *.mprof
 *.pdf
+*.txt
+*.lz4

@@ -21,7 +21,12 @@ type Compressor interface {
 func NewCompressor(name string, dst io.Writer) Compressor {
 	switch strings.ToLower(name) {
 	case "lz4":
-		return lz4.NewWriter(dst)
+		w := lz4.NewWriter(dst)
+		// For some obscure reason, we have to enable block dependancy. Failure to do so
+		// causes the lz4 library to write corrupted frames when compressing a capnp list
+		// of sufficient size. Ofcourse, this behaviour isn't documented anywhere...
+		w.Header.BlockDependency = true
+		return w
 	case "zlib":
 		return zlib.NewWriter(dst)
 	case "gzip":
