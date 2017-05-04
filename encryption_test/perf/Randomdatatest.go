@@ -206,8 +206,8 @@ func compress(data [][]byte, alg string) ([][]byte, error) {
 		spend += time.Since(start)
 		// copy the compressed data
 		compressedData[i] = buf.Bytes()
-		// clear the buffer
-		buf.Reset()
+		// get a fresh buffer
+		buf = bytes.NewBuffer(nil)
 		// reset the compressor since we closed it
 		compressor.Reset(buf)
 		if i%1000 == 999 {
@@ -240,7 +240,7 @@ func decompress(data [][]byte, alg string) ([][]byte, error) {
 			log.Debugf("Decompressing %v'th item", i+1)
 		}
 		// load the i'th piece of data
-		buf.Reset(data[i])
+		buf = bytes.NewReader(data[i])
 		// reset the decompressor
 		err = decompressor.Reset(buf)
 		if err != nil {
@@ -258,8 +258,8 @@ func decompress(data [][]byte, alg string) ([][]byte, error) {
 		spend += time.Since(start)
 		// store decompressed data
 		decompressedData[i] = targetbuf.Bytes()
-		// clear buffer holding the data for i'th block
-		targetbuf.Reset()
+		// get a fresh buffer
+		targetbuf = bytes.NewBuffer(nil)
 	}
 	log.Info("Decompression done in ", spend)
 	log.Infof("Decompressed data with %v, compressed size: %v, new size: %v", alg, getUsedSpace(data), getUsedSpace(decompressedData))
