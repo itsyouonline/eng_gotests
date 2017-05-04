@@ -35,6 +35,7 @@ func GenerateBlocks(amount int) [][]byte {
 			log.Fatalf("Failed to write block %v: %v", i, err)
 		}
 		buf[i] = writebuf.Bytes()
+		writebuf = bytes.NewBuffer(nil)
 	}
 	return buf
 }

@@ -56,6 +56,7 @@ func runTest(dataslice [][]byte, combineSlice bool) error {
 		log.Fatal(err)
 	}
 
+	// concetenate a slice of byteslices
 	if combineSlice {
 		allData := make([]byte, 0)
 		start := time.Now()
@@ -83,7 +84,7 @@ func runTest(dataslice [][]byte, combineSlice bool) error {
 		// verify decoded data
 		for i := range dataslice {
 			if !bytes.Equal(dataslice[i], dec[i]) {
-				log.Errorf("Decoded block %v does not match its original.", i)
+				log.Errorf("Decompressed block %v does not match its original.", i)
 			}
 		}
 	}
