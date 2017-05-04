@@ -39,6 +39,8 @@ runtime.
   - 3DES needs a 24 instead of 16 byte key.
   - GCM is the only authenticated mode of operation, which is recommended for strong security.
   - GCM requires a 16byte block size, thus it is not compatible with blowfish and 3DES.
+  - There is an optimized implementation in the standard library for AES in gcm mode.
+  This implementation is used automatically by the runtime.
 
 All tests are run on capnp messages containing tlog blocks, specified in the
 [capnp file](capnp/tlog_schema.capnp). For each test, the time it takes for every
@@ -66,4 +68,4 @@ results to the terminal. Additionally some flags can be supplied:
   - `--size, -s`: Set the amount of random data to store in a block (next to the fixed size fields
     that are always present)
   - `--amount, -a`: Amount of blocks to use in the test. For the test with individual blocks, this
-  amount is divided by 100 
+  amount is divided by 100
