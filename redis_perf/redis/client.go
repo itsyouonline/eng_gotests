@@ -16,6 +16,8 @@ type RedisClient interface {
 	StoreInHset(key, field string, value []byte) error
 	// GetFromHset gets a value fron an hset with the designated key from the designated field
 	GetFromHset(key, field string) ([]byte, error)
+	// GetMemUsage returns the redis memory usage
+	GetMemUsage() (int, error)
 	// StartPipe returns a new RedisPipe pipeline
 	StartPipe() RedisPipe
 }

@@ -1,6 +1,9 @@
 package redis
 
 import (
+	"strconv"
+	"strings"
+
 	log "github.com/Sirupsen/logrus"
 
 	"github.com/mediocregopher/radix.v2/redis"
@@ -58,6 +61,20 @@ func (rc RadixClient) GetFromHset(key, field string) ([]byte, error) {
 func (rp RadixPipe) GetFromHset(key, field string) ([]byte, error) {
 	rp.client.PipeAppend("HGET", key, field)
 	return nil, nil
+}
+
+func (rc RadixClient) GetMemUsage() (int, error) {
+	resp, err := rc.client.Cmd("INFO", "memory").Str()
+	if err != nil {
+		return 0, err
+	}
+	fields := strings.Fields(resp)
+	for i := range fields {
+		if strings.HasPrefix(fields[i], "used_memory:") {
+			return strconv.Atoi(strings.TrimPrefix(fields[i], "used_memory:"))
+		}
+	}
+	return 0, nil
 }
 
 func (rp RadixPipe) Execute() ([]byte, error) {

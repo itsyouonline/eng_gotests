@@ -1,6 +1,9 @@
 package redis
 
 import (
+	"strconv"
+	"strings"
+
 	log "github.com/Sirupsen/logrus"
 
 	"github.com/garyburd/redigo/redis"
@@ -54,6 +57,24 @@ func (rc RedigoClient) GetFromHset(key, field string) ([]byte, error) {
 
 func (rp RedigoPipe) GetFromHset(key, field string) ([]byte, error) {
 	return nil, rp.conn.Send("HGET", key, field)
+}
+
+func (rc RedigoClient) GetMemUsage() (int, error) {
+	resp, err := rc.conn.Do("INFO", "memory")
+	if err != nil {
+		return 0, err
+	}
+	respstring, err := redis.String(resp, err)
+	if err != nil {
+		log.Fatal("Can't cast to string: ", err)
+	}
+	fields := strings.Fields(respstring)
+	for i := range fields {
+		if strings.HasPrefix(fields[i], "used_memory:") {
+			return strconv.Atoi(strings.TrimPrefix(fields[i], "used_memory:"))
+		}
+	}
+	return 0, nil
 }
 
 func (rp RedigoPipe) Execute() ([]byte, error) {

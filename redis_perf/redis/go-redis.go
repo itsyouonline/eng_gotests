@@ -1,6 +1,9 @@
 package redis
 
 import (
+	"strconv"
+	"strings"
+
 	go_redis "github.com/go-redis/redis"
 )
 
@@ -60,6 +63,20 @@ func (rp GoRedisPipe) GetFromHset(key, field string) ([]byte, error) {
 		return nil, cmd.Err()
 	}
 	return []byte(cmd.Val()), nil
+}
+
+func (rc GoRedisClient) GetMemUsage() (int, error) {
+	cmd := rc.client.Info("memory")
+	if cmd.Err() != nil {
+		return 0, cmd.Err()
+	}
+	fields := strings.Fields(cmd.String())
+	for i := range fields {
+		if strings.HasPrefix(fields[i], "used_memory:") {
+			return strconv.Atoi(strings.TrimPrefix(fields[i], "used_memory:"))
+		}
+	}
+	return 0, nil
 }
 
 func (rp GoRedisPipe) Execute() ([]byte, error) {
