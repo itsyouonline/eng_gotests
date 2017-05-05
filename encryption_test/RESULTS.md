@@ -122,11 +122,12 @@ total input size is 248MB:
 
 Compressing individual capnp messages is very counterproductive. If the message can't
 be compressed, it actually grows in size (due to the compression headers). Also,
-a lot of time is spend, especially in the case of `lz4` looking for something to compress.
+a lot of time is spend, while (trying to) compress.
 
-That being said, `lz4` clearly outperforms `gzip` and `zlib` in terms of speed where some compression
-can be applied. As a downside, it does offer a reduced compression ratio. Overall,
-whether to apply compression or not should probably be decided on a case by case basis.
+That being said, `lz4` clearly outperforms `gzip` and `zlib` in terms of speed for large
+continuous messages. As a downside, it does offer a reduced compression ratio. For small
+individual messages, `gzip` and `zlib` perform better, with `gzip` appearing slightly better
+than `zlib`. Overall, whether to apply compression or not should probably be decided on a case by case basis.
 Due to the lack of a real dataset of sufficient size, the additional data stored here
 is generated randomly, thus it isn't compressible by definition. Should this extra data be
 structured (such as natural text), compressing might be worthwhile. In this sense,
