@@ -3,7 +3,7 @@
 Test the time to hash, compress, encrypt, rehash, store in redis, load in redis,
 decrypt and decompress binary objects.
 
-The clients to connect to redis are imported from the [redis_perf](../redis-perf/redis)
+The clients to connect to redis are imported from the [redis_perf](../redis_perf/redis)
 test. The `redigo` client is the default, but both `radix` and `go-redis` are also
 supported. For details on how to change the client and other parameters, run
 `./redis_crypto_perf -h`.
