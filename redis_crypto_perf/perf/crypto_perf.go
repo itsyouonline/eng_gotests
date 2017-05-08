@@ -100,7 +100,7 @@ func CryptoTest(amount, size int, lz4 bool, rc redis.RedisClient) error {
 		}
 	}
 	duration = time.Since(start)
-	log.Infof("Stored %v objects in %v, average %v per object", amount, duration, time.Duration(int(duration)/amount))
+	log.Infof("Stored %v objects in %v, average %v per object", len(objects), duration, time.Duration(int(duration)/len(objects)))
 
 	// get redis memory usage now that everything is stored
 	storedMemUsage, err := rc.GetMemUsage()
@@ -114,7 +114,20 @@ func CryptoTest(amount, size int, lz4 bool, rc redis.RedisClient) error {
 	redisMemUsage := storedMemUsage - initialMemUsage
 	log.Infof("Redis used %v bytes, to store %v bytes worth of data (%.2f%%)",
 		redisMemUsage, usedSpaceCiphertext, float64(100)*(float64(redisMemUsage)/float64(usedSpaceCiphertext)))
-	// TODO: RELOAD DATA FROM REDIS
+
+	// reload data from redis
+	start = time.Now()
+	objects = make([][]byte, len(md5b))
+	for i := range objects {
+		objects[i], err = rc.GetFromHset(string(md5b[i]), string(md5a[i]))
+		if err != nil {
+			log.Errorf("Failed to get object %v from redis with key %v and field %v: %v",
+				i, string(md5b[i]), string(md5a[i]), err)
+			return err
+		}
+	}
+	duration = time.Since(start)
+	log.Infof("Loaded %v objects in %v, average %v per object", len(objects), duration, time.Duration(int(duration)/len(objects)))
 
 	// decrypt data
 	start = time.Now()
