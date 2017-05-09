@@ -47,7 +47,7 @@ Example:
 ![build example](buildexample.png)
 
 An exception to this is the `capnp_benchmarks` directory. More details can be found
-there in the [capnp_benchmarks' README.md](capnp_benchmarks/README.md)
+there in the [capnp_benchmarks' README.md for go](capnp_benchmarks/go/README.md)
 
 ### code documentation
 

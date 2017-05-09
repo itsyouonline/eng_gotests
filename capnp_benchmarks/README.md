@@ -4,13 +4,13 @@ This repo holds 3 implementation of the same simple RPC server.
 There is an implementation in go, nim and python.
 The original repo can be found [here](https://docs.greenitglobe.com/rnd/capnp_bechmarks). More detailed information can be found in the respective directories, for example [go](go)
 
-## Purpose:
+## Purpose
 
 To measure/benchmark performance of the rpc protocol in different languages. Note that only
 the rpc call gets benchmarked, the server does not have any functional implementation
 for said calls.
 
-## Results :
+## Results
 
 | Number of get/set | Nim 0.15.2 | Go 1.7.5 | Python 3.5.2 |
 |-------------------|------------|----------|--------------|
