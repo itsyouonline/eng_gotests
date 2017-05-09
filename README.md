@@ -1,7 +1,7 @@
 # gotests
 
 This repo contains the code for the go tests. Code is grouped in different directories
-for different tests, e.g. all the mmap code is in onde subdirectory, and the redis code is in another.
+for different tests, e.g. all the mmap code is in one subdirectory, and the redis code is in another.
 
 ## installing
 
@@ -51,7 +51,7 @@ there in the [capnp_benchmarks' README.md](capnp_benchmarks/README.md)
 
 ### code documentation
 
-Users new to go are advised to explore the `capnp_benchmark` subdirectory first.
-Code in this directory is thoroughly documented and explained step by step. If at any
-point something should not be clear, [the official go documentation](https://golang.org/doc/effective_go.html)
-will probably have the answer
+Although all code is documented, code in the  `capnp_benchmark` subdirectory has excessive
+documentation to introduce people new to golang. If at any point something should not be clear,
+[the official go documentation](https://golang.org/doc/effective_go.html) will
+probably have the answer
