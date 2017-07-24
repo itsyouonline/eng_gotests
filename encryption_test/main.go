@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	"docs.greenitglobe.com/despiegk/gotests/encryption_test/perf"
+	"github.com/itsyouonline/eng_gotests/encryption_test/perf"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/urfave/cli"

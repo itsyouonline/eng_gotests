@@ -6,9 +6,9 @@ import (
 	"os"
 	"time"
 
-	"docs.greenitglobe.com/despiegk/gotests/redis_crypto_perf/compression"
-	"docs.greenitglobe.com/despiegk/gotests/redis_crypto_perf/encryption"
-	"docs.greenitglobe.com/despiegk/gotests/redis_perf/redis"
+	"github.com/itsyouonline/eng_gotests/redis_crypto_perf/compression"
+	"github.com/itsyouonline/eng_gotests/redis_crypto_perf/encryption"
+	"github.com/itsyouonline/eng_gotests/redis_perf/redis"
 
 	log "github.com/Sirupsen/logrus"
 )

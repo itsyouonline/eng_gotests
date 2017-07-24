@@ -5,7 +5,7 @@ package main
 import (
 	"os"
 
-	"docs.greenitglobe.com/despiegk/gotests/capnp_benchmarks/go/constants"
+	"github.com/itsyouonline/eng_gotests/capnp_benchmarks/go/constants"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/codegangsta/cli"

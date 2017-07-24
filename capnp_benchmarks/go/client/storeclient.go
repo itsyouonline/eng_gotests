@@ -6,7 +6,7 @@ import (
 	"net"
 	"time"
 
-	"docs.greenitglobe.com/despiegk/gotests/capnp_benchmarks/go/store"
+	"github.com/itsyouonline/eng_gotests/capnp_benchmarks/go/store"
 
 	log "github.com/Sirupsen/logrus"
 	"zombiezen.com/go/capnproto2/rpc"
