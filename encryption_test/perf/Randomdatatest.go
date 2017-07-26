@@ -6,10 +6,10 @@ import (
 	"io"
 	"time"
 
-	capnp "docs.greenitglobe.com/despiegk/gotests/encryption_test/capnp"
+	capnp "github.com/itsyouonline/eng_gotests/encryption_test/capnp"
 
-	"docs.greenitglobe.com/despiegk/gotests/encryption_test/compressors"
-	"docs.greenitglobe.com/despiegk/gotests/encryption_test/crypt"
+	"github.com/itsyouonline/eng_gotests/encryption_test/compressors"
+	"github.com/itsyouonline/eng_gotests/encryption_test/crypt"
 
 	log "github.com/Sirupsen/logrus"
 )

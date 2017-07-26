@@ -6,7 +6,7 @@ import (
 
 	log "github.com/Sirupsen/logrus"
 
-	"docs.greenitglobe.com/despiegk/gotests/redis_perf/redis"
+	"github.com/itsyouonline/eng_gotests/redis_perf/redis"
 )
 
 // storeDataHSetRandom stores a defined amount of objects with a given size in a redis hset.

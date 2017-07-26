@@ -7,8 +7,8 @@ import (
 	"os"
 
 	// import the `constants` package. The compiler looks for this package in:
-	// $GOPATH/src/docs.greenitglobe.com/despiegk/gotests/capnp_benchmarks/go/constants
-	"docs.greenitglobe.com/despiegk/gotests/capnp_benchmarks/go/constants"
+	// $GOPATH/src/github.com/itsyouonline/eng_gotests/capnp_benchmarks/go/constants
+	"github.com/itsyouonline/eng_gotests/capnp_benchmarks/go/constants"
 
 	// import the `logrus` package. The compiler looks for this package in:
 	// $GOPATH/src/github.com/Sirupsen/logrus

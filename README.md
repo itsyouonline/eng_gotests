@@ -7,7 +7,7 @@ for different tests, e.g. all the mmap code is in one subdirectory, and the redi
 
 First create the directory structure:
 ```bash
-mkdir -p $GOPATH/src/docs.greenitglobe.com/despiegk
+mkdir -p $GOPATH/src/github.com/itsyouonline
 ```
 
 Go looks for packages we import in very specific places, therefore it is important
@@ -15,9 +15,9 @@ to immediately put our source code in the right directory to avoid issues later 
 
 Now clone our repo with the sources:
 ```bash
-cd $GOPATH/src/docs.greenitglobe.com/despiegk
-git clone ssh://git@docs.greenitglobe.com:10022/despiegk/gotests.git
-cd gotests
+cd $GOPATH/src/docs.greenitglobe.com/itsyouonline
+git clone git@github.com:itsyouonline/eng_gotests.git
+cd eng_gotests
 ```
 
 As a last step, we need to download the dependencies:

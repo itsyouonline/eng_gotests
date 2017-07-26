@@ -3,8 +3,8 @@ package main
 import (
 	"os"
 
-	"docs.greenitglobe.com/despiegk/gotests/redis_perf/perf"
-	"docs.greenitglobe.com/despiegk/gotests/redis_perf/redis"
+	"github.com/itsyouonline/eng_gotests/redis_perf/perf"
+	"github.com/itsyouonline/eng_gotests/redis_perf/redis"
 
 	log "github.com/Sirupsen/logrus"
 

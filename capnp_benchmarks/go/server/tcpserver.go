@@ -7,7 +7,7 @@ import (
 	log "github.com/Sirupsen/logrus"
 	"zombiezen.com/go/capnproto2/rpc"
 
-	"docs.greenitglobe.com/despiegk/gotests/capnp_benchmarks/go/store"
+	"github.com/itsyouonline/eng_gotests/capnp_benchmarks/go/store"
 )
 
 //Server listens on a connection for incoming connections
